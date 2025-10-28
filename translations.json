@@ -1,0 +1,16 @@
+{
+  "en": {
+    "title": "AutoPDF Cloud v6.3",
+    "tab_pdf": "PDF",
+    "tab_bot": "Bot",
+    "generate_pdf": "Generate PDF",
+    "or_write": "or type below:",
+    "placeholder": "Enter text here...",
+    "generate_btn": "Generate",
+    "bot_title": "Bot Automator",
+    "template": "Template (use {{ nome }})",
+    "csv": "CSV: nome,data\nJohn,01/01",
+    "run_bot": "Generate in Batch",
+    "status": "PDFs generated!"
+  }
+}
