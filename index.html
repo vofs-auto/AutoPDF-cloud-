@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoPDF Cloud</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial; background:#0a0f1a; color:#dce3f0; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+    header { background:#001220; color:#00ffff; padding:12px; text-align:center; font-size:14px; }
+    .tabs { display:flex; background:#0f172a; }
+    .tab { flex:1; padding:10px; text-align:center; font-size:13px; color:#bbb; cursor:pointer; }
+    .tab.active { color:#00ffff; border-bottom:2px solid #00ffff; }
+    .content { flex:1; padding:12px; display:none; }
+    .content.active { display:block; }
+    .section { display:flex; flex-direction:column; gap:6px; }
+    input, textarea, select, button { padding:8px; border-radius:8px; border:none; font-size:13px; }
+    textarea { background:#0e182c; color:#dce3f0; height:60px; resize:none; }
+    button { background:#00b7ff; color:white; cursor:pointer; }
+    .ad-banner { position:fixed; bottom:0; width:100%; background:#1a0033; color:#00eaff; padding:6px; text-align:center; font-size:11px; }
+    .ad-banner a { color:#0ff; text-decoration:underline; }
+  </style>
+</head>
+<body>
+
+<header data-key="title">AutoPDF Cloud</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="openTab('pdf')" data-key="tab_pdf">PDF</div>
+  <div class="tab" onclick="openTab('bot')" data-key="tab_bot">Bot</div>
+</div>
+
+<div id="pdf" class="content active">
+  <div class="section">
+    <input type="file" id="pdfFile" accept=".pdf">
+    <div data-key="or_write" style="font-size:12px;color:#aaa">or type below:</div>
+    <textarea id="pdfText" placeholder="" data-key="placeholder"></textarea>
+    <button onclick="generatePDF()" data-key="generate_btn">Generate</button>
+  </div>
+</div>
+
+<div id="bot" class="content">
+  <div class="section">
+    <h3 data-key="bot_title" style="color:#00ffff;font-size:14px">Bot Automator</h3>
+    <textarea id="template" placeholder="Relatório de {{ nome }} - {{ data }}"></textarea>
+    <textarea id="csv" placeholder="nome,data\nJoão,01/01\nMaria,02/01" style="height:50px"></textarea>
+    <button onclick="runBot()" data-key="run_bot">Generate Batch</button>
+    <div id="status" style="color:#0ff;font-size:12px"></div>
+  </div>
+</div>
+
+<div class="ad-banner">
+  <strong>AD:</strong> Get 1TB Cloud for $5/mo → <a href="#">Click</a>
+</div>
+
+<script>
+const trans = {{ trans|tojson }};
+document.querySelectorAll('[data-key]').forEach(e=> {
+  const k = e.getAttribute('data-key');
+  if (trans[k]) e.innerHTML = trans[k];
+});
+document.querySelector('textarea').placeholder = trans.placeholder;
+
+function openTab(id) {
+  document.querySelectorAll('.tab,.content').forEach(e=>e.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+async function generatePDF() {
+  const file = document.getElementById('pdfFile').files[0];
+  if (file) {
+    const form = new FormData(); form.append('file', file);
+    const res = await fetch('/upload_pdf', {method:'POST', body:form});
+    const data = await res.json();
+    document.getElementById('pdfText').value = data.text || '';
+  }
+  const form = new FormData();
+  form.append('text', document.getElementById('pdfText').value || 'Hello');
+  const res = await fetch('/generate_pdf', {method:'POST', body:form});
+  const blob = await res.blob();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'doc.pdf'; a.click();
+}
+
+async function runBot() {
+  const form = new FormData();
+  form.append('template', document.getElementById('template').value);
+  form.append('csv', document.getElementById('csv').value);
+  const res = await fetch('/generate_batch', {method:'POST', body:form});
+  const blob = await res.blob();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'relatorios.zip'; a.click();
+  document.getElementById('status').textContent = trans.status;
+}
+</script>
+
+</body>
+  </html>
