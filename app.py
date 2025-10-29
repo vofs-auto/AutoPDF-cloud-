@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template, request, send_file, jsonify
 import os
 from reportlab.pdfgen import canvas
@@ -85,8 +84,6 @@ def generate_batch():
             z.write(p, os.path.basename(p))
     return send_file(zip_path, as_attachment=True, download_name="relatorios.zip")
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=500
 @app.route('/about')
 def about():
     return render_template('about.html')
@@ -101,4 +98,7 @@ def privacy():
 
 @app.route('/terms')
 def terms():
-    return render_template('terms.html')            
+    return render_template('terms.html')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
