@@ -23,7 +23,7 @@ def generate_professional_pdf(text, filepath):
     c = canvas.Canvas(filepath, pagesize=A4)
     width, height = A4
     c.setFont("Helvetica-Bold", 14)
-    c.drawString(50, height-50, "AutoPDF Cloud - Documento Gerado")
+    c.drawString(50, height - 50, "AutoPDF Cloud - Documento Gerado")
     c.setFont("Helvetica", 11)
     y = height - 80
     for line in text.split('\n'):
@@ -74,7 +74,7 @@ def generate_batch():
         text = template
         for k, v in row.items():
             text = text.replace(f"{{{{ {k} }}}}", v)
-        filename = f"pdf_{row.get('nome','doc')}.pdf"
+        filename = f"pdf_{row.get('nome', 'doc')}.pdf"
         filepath = os.path.join(app.config['GENERATED_FOLDER'], filename)
         generate_professional_pdf(text, filepath)
         pdfs.append(filepath)
@@ -84,6 +84,7 @@ def generate_batch():
             z.write(p, os.path.basename(p))
     return send_file(zip_path, as_attachment=True, download_name="relatorios.zip")
 
+# Rotas adicionais (devem vir antes do app.run)
 @app.route('/about')
 def about():
     return render_template('about.html')
@@ -101,4 +102,4 @@ def terms():
     return render_template('terms.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=500)
