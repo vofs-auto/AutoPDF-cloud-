@@ -1,71 +1,303 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AutoPDF Cloud</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:Arial; background:#0a0f1a; color:#dce3f0; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-    header { background:#001220; color:#00ffff; padding:12px; text-align:center; font-size:14px; }
-    .tabs { display:flex; background:#0f172a; }
-    .tab { flex:1; padding:10px; text-align:center; font-size:13px; color:#bbb; cursor:pointer; }
-    .tab.active { color:#00ffff; border-bottom:2px solid #00ffff; }
-    .content { flex:1; padding:12px; display:none; }
-    .content.active { display:block; }
-    .section { display:flex; flex-direction:column; gap:6px; }
-    input, textarea, select, button { padding:8px; border-radius:8px; border:none; font-size:13px; }
-    textarea { background:#0e182c; color:#dce3f0; height:60px; resize:none; }
-    button { background:#00b7ff; color:white; cursor:pointer; }
-    .ad-banner { position:fixed; bottom:0; width:100%; background:#1a0033; color:#00eaff; padding:6px; text-align:center; font-size:11px; }
-    .ad-banner a { color:#0ff; text-decoration:underline; }
+    :root {
+      --bg:#0a0f1a;
+      --text:#dce3f0;
+      --accent:#00ffff;
+      --panel:#0f172a;
+      --btn:#00b7ff;
+      --banner:#1a0033;
+      --card:#0e182c;
+    }
+
+    [data-theme="light"] {
+      --bg:#f8f9fc;
+      --text:#111;
+      --accent:#0077ff;
+      --panel:#e6e9f1;
+      --btn:#007bff;
+      --banner:#cfe2ff;
+      --card:#fff;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; transition:all 0.3s ease; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow-x:hidden;
+    }
+
+    header {
+      background:var(--panel);
+      color:var(--accent);
+      padding:14px;
+      text-align:center;
+      font-size:1rem;
+      font-weight:bold;
+      letter-spacing:0.5px;
+      box-shadow:0 2px 10px rgba(0,255,255,0.2);
+      position:relative;
+    }
+
+    .menu-icon {
+      position:absolute;
+      right:15px;
+      top:12px;
+      cursor:pointer;
+      font-size:20px;
+      color:var(--accent);
+    }
+
+    .tabs {
+      display:flex;
+      background:var(--panel);
+      border-bottom:1px solid #1e2d47;
+    }
+
+    .tab {
+      flex:1;
+      padding:12px;
+      text-align:center;
+      font-size:0.9rem;
+      color:#bbb;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .tab.active {
+      color:var(--accent);
+      border-bottom:3px solid var(--accent);
+      background:rgba(0,0,0,0.2);
+    }
+
+    .content {
+      flex:1;
+      padding:16px;
+      display:none;
+      overflow-y:auto;
+      scroll-behavior:smooth;
+    }
+
+    .content.active {
+      display:block;
+    }
+
+    .section {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    input, textarea, button, select {
+      padding:10px;
+      border-radius:8px;
+      border:none;
+      font-size:14px;
+      background:var(--card);
+      color:var(--text);
+    }
+
+    textarea { resize:none; min-height:70px; }
+    button {
+      background:var(--btn);
+      color:white;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button:hover {
+      opacity:0.9;
+      transform:scale(1.03);
+    }
+
+    /* MENU DE CONFIGURAÇÕES */
+    #settingsPanel {
+      position:fixed;
+      top:0;
+      right:-280px;
+      width:260px;
+      height:100%;
+      background:var(--panel);
+      box-shadow:-2px 0 10px rgba(0,0,0,0.5);
+      padding:20px;
+      transition:0.4s;
+      display:flex;
+      flex-direction:column;
+      gap:15px;
+      z-index:20;
+    }
+
+    #settingsPanel.active { right:0; }
+
+    #settingsPanel h3 {
+      color:var(--accent);
+      text-align:center;
+      margin-bottom:10px;
+    }
+
+    .ad-banner {
+      position:fixed;
+      bottom:0;
+      left:0;
+      width:100%;
+      background:var(--banner);
+      color:var(--accent);
+      padding:8px;
+      text-align:center;
+      font-size:12px;
+      border-top:1px solid var(--accent);
+      z-index:10;
+    }
+
+    .ad-banner a { color:var(--accent); text-decoration:underline; }
+
+    footer {
+      text-align:center;
+      padding:15px;
+      font-size:12px;
+      color:#aaa;
+      background:var(--panel);
+      border-top:1px solid var(--accent);
+    }
+
+    footer a {
+      color:#aaa;
+      margin:0 10px;
+      text-decoration:none;
+      transition:0.3s;
+    }
+
+    footer a:hover { color:var(--accent); }
+
+    /* Responsivo */
+    @media (max-width:600px) {
+      body { font-size:14px; }
+      .tab { font-size:13px; padding:10px; }
+      header { font-size:15px; }
+      #settingsPanel { width:220px; }
+      .ad-banner { font-size:11px; padding:5px; }
+    }
+
+    @media (min-width:900px) {
+      .content { max-width:850px; margin:auto; }
+      textarea { min-height:100px; }
+    }
   </style>
 </head>
+
 <body>
 
-<header data-key="title">AutoPDF Cloud</header>
+<header>
+  AutoPDF Cloud
+  <div class="menu-icon" onclick="toggleSettings()">⚙️</div>
+</header>
 
 <div class="tabs">
-  <div class="tab active" onclick="openTab('pdf')" data-key="tab_pdf">PDF</div>
-  <div class="tab" onclick="openTab('bot')" data-key="tab_bot">Bot</div>
+  <div class="tab active" onclick="openTab('pdf')">Gerar PDF</div>
+  <div class="tab" onclick="openTab('bot')">Batch PDF Bot</div>
 </div>
 
+<!-- TELA 1 -->
 <div id="pdf" class="content active">
   <div class="section">
     <input type="file" id="pdfFile" accept=".pdf">
-    <div data-key="or_write" style="font-size:12px;color:#aaa">or type below:</div>
-    <textarea id="pdfText" placeholder="" data-key="placeholder"></textarea>
-    <button onclick="generatePDF()" data-key="generate_btn">Generate</button>
+    <div style="font-size:13px;color:#aaa;">ou digite abaixo:</div>
+    <textarea id="pdfText" placeholder="Escreva seu texto aqui..."></textarea>
+    <button onclick="generatePDF()">Gerar PDF</button>
   </div>
 </div>
 
+<!-- TELA 2 -->
 <div id="bot" class="content">
   <div class="section">
-    <h3 data-key="bot_title" style="color:#00ffff;font-size:14px">Bot Automator</h3>
-    <textarea id="template" placeholder="Relatório de {{ nome }} - {{ data }}"></textarea>
-    <textarea id="csv" placeholder="nome,data\nJoão,01/01\nMaria,02/01" style="height:50px"></textarea>
-    <button onclick="runBot()" data-key="run_bot">Generate Batch</button>
-    <div id="status" style="color:#0ff;font-size:12px"></div>
+    <h3 style="color:var(--accent);">Batch PDF Bot — Relatórios automáticos</h3>
+    <p style="font-size:13px;color:#aaa;">Preencha os campos abaixo:</p>
+    <label>Modelo:</label>
+    <textarea id="template" placeholder="Ex: Relatório de {{ nome }} sobre {{ assunto }} - Data: {{ data }}"></textarea>
+    <label>Lista (CSV):</label>
+    <textarea id="csv" placeholder="nome,assunto,data\nJoão,Marketing,01/01\nMaria,Vendas,02/01"></textarea>
+    <button onclick="runBot()">Gerar Relatórios</button>
+    <div id="status" style="color:var(--accent);font-size:13px;"></div>
   </div>
 </div>
 
-<div class="ad-banner">
-  <strong>AD:</strong> Get 1TB Cloud for $5/mo → <a href="#">Click</a>
+<!-- MENU CONFIGURAÇÕES -->
+<div id="settingsPanel">
+  <h3>Configurações ⚙️</h3>
+  <label for="themeSelect">Tema:</label>
+  <select id="themeSelect" onchange="changeTheme(this.value)">
+    <option value="auto">Automático</option>
+    <option value="dark">Escuro</option>
+    <option value="light">Claro</option>
+  </select>
+
+  <label for="langSelect">Idioma:</label>
+  <select id="langSelect">
+    <option>English</option>
+    <option>Português</option>
+    <option>Español</option>
+    <option>Français</option>
+    <option>Deutsch</option>
+    <option>Italiano</option>
+    <option>日本語</option>
+    <option>한국어</option>
+    <option>中文</option>
+    <option>Русский</option>
+  </select>
+
+  <p style="font-size:12px;color:#aaa;margin-top:10px;">
+    As mudanças são salvas automaticamente.
+  </p>
 </div>
 
-<script>
-const trans = {{ trans|tojson }};
-document.querySelectorAll('[data-key]').forEach(e=> {
-  const k = e.getAttribute('data-key');
-  if (trans[k]) e.innerHTML = trans[k];
-});
-document.querySelector('textarea').placeholder = trans.placeholder;
+<!-- Banner -->
+<div class="ad-banner">
+  <strong>AD:</strong> Get 1TB Cloud for $5/mo → <a href="#">Click here</a>
+</div>
 
+<!-- Rodapé -->
+<footer>
+  <a href="/about">About</a> |
+  <a href="/contact">Contact</a> |
+  <a href="/privacy">Privacy</a> |
+  <a href="/terms">Terms</a>
+</footer>
+
+<script>
 function openTab(id) {
   document.querySelectorAll('.tab,.content').forEach(e=>e.classList.remove('active'));
   event.target.classList.add('active');
   document.getElementById(id).classList.add('active');
 }
+
+function toggleSettings(){
+  document.getElementById("settingsPanel").classList.toggle("active");
+}
+
+function changeTheme(mode){
+  if(mode==="auto"){
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.body.dataset.theme = prefersDark ? "dark" : "light";
+  } else {
+    document.body.dataset.theme = mode;
+  }
+  localStorage.setItem("theme", mode);
+}
+
+// Recupera o tema salvo
+const savedTheme = localStorage.getItem("theme") || "auto";
+changeTheme(savedTheme);
+document.getElementById("themeSelect").value = savedTheme;
 
 async function generatePDF() {
   const file = document.getElementById('pdfFile').files[0];
@@ -79,7 +311,7 @@ async function generatePDF() {
   form.append('text', document.getElementById('pdfText').value || 'Hello');
   const res = await fetch('/generate_pdf', {method:'POST', body:form});
   const blob = await res.blob();
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'doc.pdf'; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'document.pdf'; a.click();
 }
 
 async function runBot() {
@@ -89,14 +321,9 @@ async function runBot() {
   const res = await fetch('/generate_batch', {method:'POST', body:form});
   const blob = await res.blob();
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'relatorios.zip'; a.click();
-  document.getElementById('status').textContent = trans.status;
+  document.getElementById('status').textContent = "✔️ Relatórios prontos para download.";
 }
 </script>
-<footer style="text-align:center;padding:15px;font-size:12px;color:#aaa;">
-  <a href="/about" style="color:#aaa;margin:0 10px;">About</a> |
-  <a href="/contact" style="color:#aaa;margin:0 10px;">Contact</a> |
-  <a href="/privacy" style="color:#aaa;margin:0 10px;">Privacy</a> |
-  <a href="/terms" style="color:#aaa;margin:0 10px;">Terms</a>
-</footer>
+
 </body>
   </html>
