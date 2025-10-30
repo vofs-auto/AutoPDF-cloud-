@@ -1,119 +1,148 @@
 from flask import Flask, render_template, request, send_file, jsonify
-import os
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from PyPDF2 import PdfReader
+from reportlab.pdfgen import canvas
+from io import BytesIO
+import json, os
 from datetime import datetime
-import json
-import csv
-from io import StringIO, BytesIO
-import zipfile
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['GENERATED_FOLDER'] = 'generated'
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['GENERATED_FOLDER'], exist_ok=True)
 
-# Carregar traduções
-with open('translations.json', 'r', encoding='utf-8') as f:
-    translations = json.load(f)
+COUNTER_FILE = "counter.json"
 
-# ---------- Função para gerar PDF ----------
-def generate_professional_pdf(text, filepath):
-    c = canvas.Canvas(filepath, pagesize=A4)
-    width, height = A4
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(50, height - 50, "AutoPDF Cloud - Documento Gerado")
+def load_counter():
+    if not os.path.exists(COUNTER_FILE):
+        with open(COUNTER_FILE, "w") as f:
+            json.dump({"count": 0}, f)
+    with open(COUNTER_FILE, "r") as f:
+        return json.load(f)
+
+def save_counter(value):
+    with open(COUNTER_FILE, "w") as f:
+        json.dump({"count": value}, f)
+
+def increment_counter():
+    data = load_counter()
+    data["count"] += 1
+    save_counter(data["count"])
+    return data["count"]
+
+def get_counter():
+    return load_counter()["count"]
+
+# ----- DRAW CARD FUNCTION -----
+def draw_card(c, width, height, record):
+    pad = 40
+    c.setFillColorRGB(0.06,0.11,0.18)
+    c.roundRect(pad, pad, width - 2*pad, height - 2*pad, 12, stroke=0, fill=1)
+    c.setFillColorRGB(0.0,0.8,0.94)
+    c.roundRect(pad, height - 80, width - 2*pad, 18, 6, stroke=0, fill=1)
+
+    c.setFillColorRGB(1,1,1)
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(pad + 14, height - 100, record.get('subject','').strip()[:80])
+    c.setFont("Helvetica", 13)
+    c.setFillColorRGB(0.88,0.96,1)
+    c.drawString(pad + 14, height - 130, "Name: " + record.get('name','').strip())
+    c.setFont("Helvetica", 12)
+    c.setFillColorRGB(0.78,0.86,0.9)
+    c.drawString(pad + 14, height - 150, "Date: " + record.get('date','').strip())
+
+    details = record.get('details','').strip()
     c.setFont("Helvetica", 11)
+    c.setFillColorRGB(0.9,0.95,1)
+    text = c.beginText()
+    text.setTextOrigin(pad + 14, height - 180)
+    text.setLeading(14)
+    max_chars = 70
+    for line in details.splitlines() or ['']:
+        while len(line) > max_chars:
+            text.textLine(line[:max_chars])
+            line = line[max_chars:]
+        text.textLine(line)
+    c.drawText(text)
 
-    y = height - 80
-    for line in text.splitlines():  # Evita quadrados nas quebras
-        if y < 60:
-            c.showPage()
-            c.setFont("Helvetica", 11)
-            y = height - 60
-        c.drawString(50, y, line)
-        y -= 14
-    c.save()
-
-# ---------- Página inicial ----------
+# ----- ROUTES -----
 @app.route('/')
 def index():
-    lang = request.args.get('lang', 'en')
-    if lang not in translations:
-        lang = 'en'
-    return render_template('index.html', trans=translations[lang], lang=lang)
+    return render_template('index.html', count=get_counter())
 
-# ---------- Gerar PDF único ----------
 @app.route('/generate_pdf', methods=['POST'])
 def generate_pdf():
-    text = request.form.get('text', '').strip()
+    text = request.form.get('text','').replace('\r','')
     if not text:
-        return jsonify({"error": "Empty text"}), 400
+        return "No text", 400
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    y = height - 60
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, y, "AutoPDF Cloud")
+    c.setFont("Helvetica", 12)
+    y -= 30
+    for line in text.split('\n'):
+        if y < 60:
+            c.showPage()
+            c.setFont("Helvetica",12)
+            y = height - 60
+        c.drawString(50, y, line)
+        y -= 16
+    c.save()
+    buffer.seek(0)
+    increment_counter()
+    return send_file(buffer, as_attachment=True, download_name="document.pdf", mimetype='application/pdf')
 
-    filename = f"doc_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-    filepath = os.path.join(app.config['GENERATED_FOLDER'], filename)
-    generate_professional_pdf(text, filepath)
-    return send_file(filepath, as_attachment=True, download_name=filename)
-
-# ---------- Upload e leitura de PDF ----------
 @app.route('/upload_pdf', methods=['POST'])
 def upload_pdf():
     if 'file' not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
+        return jsonify({"error":"No file"}),400
     file = request.files['file']
-    if not file.filename.lower().endswith('.pdf'):
-        return jsonify({"error": "File must be PDF"}), 400
+    try:
+        from PyPDF2 import PdfReader
+        reader = PdfReader(file)
+        text = ""
+        for p in reader.pages:
+            text += (p.extract_text() or "") + "\n"
+        return jsonify({"text": text})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(filepath)
-
-    reader = PdfReader(filepath)
-    text = ""
-    for page in reader.pages:
-        text += (page.extract_text() or "") + "\n"
-    return jsonify({"text": text[:5000]})
-
-# ---------- Batch PDF Bot ----------
 @app.route('/generate_batch', methods=['POST'])
 def generate_batch():
-    template = request.form.get('template', '')
-    csv_data = request.form.get('csv', '')
-    if not template or not csv_data:
-        return jsonify({"error": "Missing data"}), 400
+    data = request.get_json(silent=True)
+    if not data or 'rows' not in data:
+        return "Bad request", 400
+    rows = data['rows']
+    if not isinstance(rows, list) or len(rows) == 0:
+        return "No rows", 400
+    if len(rows) > 82:
+        return "Too many rows (max 82)", 400
 
-    reader = csv.DictReader(StringIO(csv_data))
-    zip_buffer = BytesIO()
-    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as z:
-        for row in reader:
-            text = template
-            for k, v in row.items():
-                text = text.replace(f"{{{{ {k} }}}}", v)
-            filename = f"report_{row.get('nome', 'user')}_{datetime.now().strftime('%H%M%S')}.pdf"
-            pdf_buffer = BytesIO()
-            generate_professional_pdf(text, pdf_buffer)
-            z.writestr(filename, pdf_buffer.getvalue())
-    zip_buffer.seek(0)
-    return send_file(zip_buffer, as_attachment=True, download_name="reports.zip", mimetype='application/zip')
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
 
-# ---------- Páginas estáticas ----------
+    for record in rows:
+        draw_card(c, width, height, record)
+        c.showPage()
+
+    c.save()
+    buffer.seek(0)
+    increment_counter()
+    filename = f"batch_cards_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    return send_file(buffer, as_attachment=True, download_name=filename, mimetype='application/pdf')
+
+@app.route('/counter')
+def counter():
+    return jsonify({"count": get_counter()})
+
 @app.route('/about')
-def about():
-    return render_template('about.html')
-
+def about(): return render_template('about.html')
 @app.route('/contact')
-def contact():
-    return render_template('contact.html')
-
+def contact(): return render_template('contact.html')
 @app.route('/privacy')
-def privacy():
-    return render_template('privacy.html')
-
+def privacy(): return render_template('privacy.html')
 @app.route('/terms')
-def terms():
-    return render_template('terms.html')
+def terms(): return render_template('terms.html')
 
-# ---------- Inicialização ----------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
