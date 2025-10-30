@@ -1,236 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AutoPDF Cloud — Batch Cards</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoPDF Cloud - Generate and Manage PDFs</title>
   <style>
-    :root{
-      --bg:#071126; --card:#0f1b2b; --accent:#00e6ff; --muted:#9fb6c9; --good:#0f8a4a; --bad:#c62828;
-      --btn:#00b7ff;
+    body {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      background: #f8fafc;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:#e6f6ff;min-height:100vh;display:flex;flex-direction:column}
-    header{padding:14px 18px;background:linear-gradient(90deg,#00121f,#002b45);display:flex;align-items:center;justify-content:space-between}
-    header h1{font-size:1rem;margin:0;color:var(--accent)}
-    .top-right{display:flex;gap:8px;align-items:center}
-    .tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.03)}
-    .tab{flex:1;padding:12px;text-align:center;cursor:pointer;background:transparent;color:var(--muted)}
-    .tab.active{color:var(--accent);border-bottom:3px solid var(--accent);background:linear-gradient(180deg,rgba(0,0,0,0.15),transparent)}
-    main{flex:1;display:flex;gap:18px;padding:16px;align-items:flex-start}
-    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:14px;flex:1;min-width:260px}
-    .small{font-size:13px;color:var(--muted);margin-bottom:8px}
-    input,textarea,select,button{border-radius:8px;border:0;padding:10px;font-size:14px}
-    textarea{min-height:60px;background:#081626;color:inherit;resize:vertical}
-    .row{display:flex;gap:8px;margin-bottom:8px}
-    .row input{flex:1;background:#071826;color:inherit}
-    .actions{display:flex;gap:8px;align-items:center}
-    .btn{background:var(--btn);color:#001;padding:10px 12px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,183,255,0.12)}
-    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.04)}
-    .list{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto;padding-right:6px}
-    .item{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));padding:12px;border-radius:10px;display:grid;grid-template-columns:1fr 80px;gap:8px;align-items:start}
-    .fields{display:flex;flex-direction:column;gap:8px}
-    .label{font-size:12px;color:var(--muted)}
-    .controls{display:flex;flex-direction:column;gap:8px;align-items:center}
-    .add{background:linear-gradient(90deg,#46d6aa,#17b978);color:#002;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700}
-    .remove{background:linear-gradient(90deg,#ff5454,#c62828);color:white;padding:6px 10px;border-radius:8px;cursor:pointer;border:0}
-    .limitNote{font-size:13px;color:#ffdca8;margin-top:6px}
-    .status{font-size:13px;color:var(--accent);margin-top:10px;text-align:center}
-    .ad-banner{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:#05041a;color:var(--accent);padding:10px 14px;border-radius:10px;border:1px solid rgba(0,230,255,0.06)}
-    footer{padding:10px 16px;text-align:center;color:#9fb6c9;font-size:13px}
-    @media (max-width:900px){
-      main{flex-direction:column}
-      .item{grid-template-columns:1fr;align-items:stretch}
-      .controls{flex-direction:row;justify-content:flex-end}
+
+    header {
+      background: linear-gradient(90deg, #0078ff, #00c6ff);
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    nav {
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #0078ff;
+      font-weight: 600;
+      margin: 0 0.5rem;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 6rem;
+    }
+
+    .card {
+      background: white;
+      width: 100%;
+      max-width: 650px;
+      margin: 1rem 0;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+    }
+
+    h2 {
+      text-align: center;
+      color: #0078ff;
+      margin-bottom: 1rem;
+    }
+
+    textarea, input, button {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    button {
+      background: #0078ff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #005fcc;
+    }
+
+    .footer {
+      background: #f1f5f9;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    /* --- Advertisement Section --- */
+    .ad-section {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #fff9e6;
+      border-top: 2px solid #ffcc00;
+      text-align: center;
+      padding: 0.8rem;
+      z-index: 1000;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+    }
+
+    .ad-section h4 {
+      margin: 0;
+      color: #333;
+      font-size: 0.9rem;
+    }
+
+    .ad-content {
+      margin-top: 0.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .ad-box {
+      background: #fff;
+      border: 1px solid #ffcc00;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .ad-box:hover {
+      background: #fffae0;
+      transform: scale(1.02);
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>AutoPDF Cloud — Batch Cards</h1>
-    <div class="top-right">
-  <div style="font-size:13px;color:var(--muted)">Logged: Guest</div>
-  <div style="width:8px"></div>
-  <div title="PDFs generated" id="pdfCount" style="color:#00e6ff;font-weight:600;">PDFs: {{count}}</div>
-  <div style="width:8px"></div>
-  <div title="Settings">⚙️</div>
-    </div>
-  </header>
 
-  <div class="tabs">
-    <div class="tab active" onclick="openTab('pdf')">Generate PDF</div>
-    <div class="tab" onclick="openTab('batch')">Batch PDF Bot</div>
-  </div>
+  <header>AutoPDF Cloud</header>
+
+  <nav>
+    <div>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+    </div>
+    <div>⚙️</div>
+  </nav>
 
   <main>
-    <!-- left: pdf single -->
-    <section class="panel" id="pdf" style="flex-basis:380px">
-      <div class="small">Single PDF — upload or type text</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <input type="file" id="pdfFile" accept=".pdf" />
-        <textarea id="pdfText" placeholder="Type content here..."></textarea>
-        <div style="display:flex;gap:8px">
-          <button class="btn" onclick="generatePDF()">Generate PDF</button>
-          <button class="btn ghost" onclick="clearSingle()">Clear</button>
-        </div>
-        <div class="small" style="margin-top:6px;color:var(--muted)">Works with uploaded PDF text extraction or typed content.</div>
-      </div>
-    </section>
+    <div class="card">
+      <h2>Generate PDF</h2>
+      <form id="pdfForm" method="POST" action="/generate_pdf">
+        <textarea name="text" rows="10" placeholder="Write your text here..." required></textarea>
+        <button type="submit">Generate PDF</button>
+      </form>
+    </div>
 
-    <!-- right: batch -->
-    <section class="panel" id="batch" style="flex:2">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong style="color:var(--accent)">Batch PDF Creator (cards)</strong><div class="small">Max 82 entries — one card per PDF page</div></div>
-        <div class="actions">
-          <button class="add" id="addBtn">+ Add Entry</button>
-          <button class="btn" id="generateBatch">Generate Batch PDF</button>
-        </div>
-      </div>
-
-      <div class="list" id="entries"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-        <div class="limitNote">Limit: <strong id="count">0</strong> / 82</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn ghost" onclick="loadExample()">Load Example</button>
-          <button class="btn ghost" onclick="clearAll()">Clear All</button>
-        </div>
-      </div>
-      <div id="batchStatus" class="status"></div>
-    </section>
+    <div class="card">
+      <h2>Batch PDF Bot</h2>
+      <form id="batchForm" method="POST" action="/generate_batch">
+        <textarea name="template" rows="5" placeholder="Write your template with {{ name }}, {{ subject }}, {{ date }}..."></textarea>
+        <textarea name="csv" rows="5" placeholder="Paste CSV data (headers required)"></textarea>
+        <button type="submit">Generate Multiple PDFs</button>
+      </form>
+    </div>
   </main>
 
-  <div class="ad-banner">AD:</div>
-
-  <footer>
-    <a href="/about">About</a> • <a href="/contact">Contact</a> • <a href="/privacy">Privacy</a> • <a href="/terms">Terms</a>
+  <footer class="footer">
+    © 2025 AutoPDF Cloud. All rights reserved.
   </footer>
 
-<script>
-/* CORE: manage entries up to 82 */
-const MAX = 82;
-let idx = 0;
-const list = document.getElementById('entries');
-const countEl = document.getElementById('count');
-const statusEl = document.getElementById('batchStatus');
-
-function updateCount(){ countEl.textContent = list.children.length; }
-
-function makeItem(data){
-  idx++;
-  const id = 'it'+idx;
-  const div = document.createElement('div');
-  div.className = 'item';
-  div.id = id;
-  div.innerHTML = `
-    <div class="fields">
-      <div class="label">Assunto (subject)</div>
-      <input placeholder="Ex: Product Brief" class="subject" value="${data?.subject||''}"/>
-      <div class="label">Nome (name)</div>
-      <input placeholder="Ex: Victor Octavio" class="name" value="${data?.name||''}"/>
-      <div class="label">Data (date)</div>
-      <input placeholder="Ex: 08/12/2024" class="date" value="${data?.date||''}"/>
-      <div class="label">Detalhes (optional)</div>
-      <textarea class="details" placeholder="Additional info: product, career, notes...">${data?.details||''}</textarea>
+  <!-- Advertisement Section -->
+  <div class="ad-section">
+    <h4>Sponsored Ads</h4>
+    <div class="ad-content">
+      <!-- Insert your ad code below -->
+      <div class="ad-box">Your Ad 1</div>
+      <div class="ad-box">Your Ad 2</div>
+      <div class="ad-box">Your Ad 3</div>
+      <!-- Example for AdSense or affiliate banners -->
+      <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+           <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+                data-ad-slot="XXXXXXXXXX"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+           <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
     </div>
-    <div class="controls">
-      <button class="add" title="Add page" onclick="addNear('${id}')">+ Add</button>
-      <button class="remove" title="Remove page" onclick="removeItem('${id}')">− Remove</button>
-    </div>
-  `;
-  return div;
-}
+  </div>
 
-function addItemAtEnd(data){
-  if(list.children.length >= MAX){ alert('Max entries reached: '+MAX); return; }
-  const it = makeItem(data);
-  list.appendChild(it);
-  updateCount();
-}
-function addNear(id){
-  if(list.children.length >= MAX){ alert('Max reached'); return; }
-  const ref = document.getElementById(id);
-  const next = ref.nextSibling;
-  const it = makeItem();
-  if(next) list.insertBefore(it, next); else list.appendChild(it);
-  updateCount();
-}
-function removeItem(id){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.remove();
-  updateCount();
-}
-document.getElementById('addBtn').addEventListener('click', ()=>addItemAtEnd());
-
-function clearAll(){ if(confirm('Clear all entries?')){ list.innerHTML=''; updateCount(); statusEl.textContent=''; } }
-function clearSingle(){ document.getElementById('pdfText').value=''; }
-
-function loadExample(){
-  clearAll();
-  addItemAtEnd({subject:'Curriculum - Developer',name:'Victor Octavio',date:'08/12/2024',details:'Full-stack developer'});
-  addItemAtEnd({subject:'Product Brief',name:'Widget 3000',date:'01/01/2025',details:'Specs and pricing'});
-  statusEl.textContent='Loaded 2 example entries';
-}
-
-/* collect rows and POST JSON to backend */
-async function generateBatch(){
-  const items = Array.from(list.children);
-  if(items.length===0){ alert('Add at least 1 entry'); return; }
-  const rows = [];
-  for(const it of items){
-    const subject = it.querySelector('.subject').value.trim();
-    const name = it.querySelector('.name').value.trim();
-    const date = it.querySelector('.date').value.trim();
-    const details = it.querySelector('.details').value.trim();
-    rows.push({subject,name,date,details});
-  }
-  statusEl.textContent='Generating PDF — please wait...';
-  document.getElementById('generateBatch').disabled = true;
-
-  try{
-    const res = await fetch('/generate_batch', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({rows})
-    });
-    if(!res.ok){ const err = await res.text(); throw new Error(err||'Server error'); }
-    const blob = await res.blob();
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'batch_cards.pdf'; a.click();
-    statusEl.textContent = '✅ Batch PDF generated';
-  }catch(e){
-    statusEl.textContent = 'Error: '+e.message;
-  }finally{
-    document.getElementById('generateBatch').disabled = false;
-  }
-}
-
-/* wire buttons */
-document.getElementById('generateBatch').addEventListener('click', generateBatch);
-
-/* small PDF single generator using existing endpoints (keeps old behavior) */
-async function generatePDF(){
-  const file = document.getElementById('pdfFile').files[0];
-  if(file){
-    const form = new FormData(); form.append('file', file);
-    const r = await fetch('/upload_pdf', {method:'POST', body:form});
-    const j = await r.json(); document.getElementById('pdfText').value = j.text || '';
-  }
-  const form = new FormData(); form.append('text', document.getElementById('pdfText').value || 'Hello');
-  const r2 = await fetch('/generate_pdf', {method:'POST', body:form});
-  const blob = await r2.blob(); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='document.pdf'; a.click();
-}
-
-/* init */
-updateCount();
-  async function refreshCounter(){
-  try{
-    const res = await fetch('/counter');
-    const j = await res.json();
-    document.getElementById('pdfCount').textContent = "PDFs: " + j.count;
-  }catch(e){}
-}
-setInterval(refreshCounter, 6000);
-</script>
 </body>
-          </html>
+        </html>
