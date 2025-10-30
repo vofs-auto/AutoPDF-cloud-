@@ -1,120 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About AutoPDF Cloud v6.3 - Free Global PDF Tool</title>
-  <meta name="description" content="AutoPDF Cloud is a 100% free web tool to generate professional PDFs and automate tasks in 10 languages. No signup, no data stored.">
+  <meta charset="utf-8" />
+  <title>About AutoPDF Cloud</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="index,follow" />
   <style>
-    body {font-family:Arial,Helvetica,sans-serif;background:#0a0f1a;color:#dce3f0;padding:20px;line-height:1.8;}
-    .container {max-width:900px;margin:0 auto;background:#111827;padding:35px;border-radius:18px;box-shadow:0 0 25px rgba(0,255,255,0.15);}
-    h1 {color:#00ffff;text-align:center;font-size:28px;margin-bottom:30px;}
-    h2 {color:#00b7ff;margin:35px 0 20px;font-size:22px;}
-    p {margin:16px 0;font-size:15px;}
-    ul, ol {padding-left:35px;margin:18px 0;}
-    li {margin:8px 0;}
-    a {color:#00b7ff;text-decoration:underline;}
-    .highlight {background:#1a0033;padding:20px;border-left:5px solid #00ffff;border-radius:0 10px 10px 0;margin:25px 0;font-size:15px;}
-    .stats {display:flex;justify-content:space-around;flex-wrap:wrap;margin:30px 0;}
-    .stat {text-align:center;background:#1e293b;padding:15px;border-radius:12px;width:180px;margin:10px;}
-    .stat strong {color:#00ffff;font-size:20px;display:block;}
+    :root{--bg:#0d1117;--card:#161b22;--text:#e6edf3;--accent:#00e6ff;--muted:#8b949e}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+    header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--card);border-bottom:1px solid #1f2937}
+    header h1{color:var(--accent);font-size:20px}
+    .top-right{display:flex;gap:12px;align-items:center;color:var(--muted)}
+    #ad-banner{background:#1a0033;padding:8px;border-bottom:1px solid #1f2937;min-height:60px;position:sticky;top:48px;z-index:20}
+    .container{max-width:950px;margin:28px auto;padding:22px;background:var(--card);border-radius:14px;box-shadow:0 0 14px rgba(0,0,0,0.4)}
+    h2{color:var(--accent);margin-bottom:12px}
+    p{line-height:1.7;margin:12px 0;color:var(--text)}
+    footer{padding:15px;text-align:center;color:var(--muted);border-top:1px solid #1f2937;margin-top:30px}
+    a{color:var(--muted)}
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>About AutoPDF Cloud v6.3</h1>
-
-  <p><strong>AutoPDF Cloud</strong> is a completely free web application that helps people around the world create professional PDF documents and automate repetitive tasks — with no cost, no registration, and no limitations.</p>
-
-  <div class="highlight">
-    <strong>No sign-up. No watermarks. No hidden fees. Just simple, powerful tools for everyone.</strong>
+<header>
+  <h1>AutoPDF Cloud</h1>
+  <div class="top-right">
+    <span>User: Guest</span>
+    <span id="pdfCount">PDFs: {{count}}</span>
+    <span style="cursor:pointer" onclick="window.location='/';">🏠</span>
   </div>
+</header>
 
-  <h2>Our Mission</h2>
-  <p>We believe that everyone should have access to high-quality document tools, no matter where they live or how much money they have. A student in a small town, a teacher in a big city, a small business owner, or a volunteer — all deserve the same professional results.</p>
+<div id="ad-banner"><!-- ad slot: paste AdSense or other ad code here --></div>
 
-  <p>That’s why AutoPDF Cloud is built to be easy to use, fast, and available in the world’s most spoken languages.</p>
+<main class="container">
+  <h2>About AutoPDF Cloud</h2>
 
-  <h2>What We Offer</h2>
-  <p>Our platform includes two powerful tools:</p>
-
-  <ul>
-    <li><strong>PDF Generator</strong>: Turn any text into a clean, professional PDF with perfect formatting</li>
-    <li><strong>Automation Bot</strong>: Create hundreds of personalized documents using a simple template and data list</li>
-    <li><strong>10 Languages</strong>: Use the tool in English, Chinese, Hindi, Spanish, French, Arabic, Bengali, Russian, Japanese, or German</li>
-    <li><strong>No File Storage</strong>: Your documents are created instantly and never saved on our servers</li>
-    <li><strong>Works on Any Device</strong>: Use it on your phone, tablet, or computer — no app needed</li>
-  </ul>
-
-  <h2>Who Uses AutoPDF Cloud?</h2>
-  <p>Every month, people from over 140 countries use our tool for:</p>
-
-  <ul>
-    <li>Students writing school reports and project papers</li>
-    <li>Teachers making certificates and progress reports</li>
-    <li>Small shops creating invoices and receipts</li>
-    <li>Freelancers sending professional proposals</li>
-    <li>Community groups making event flyers and donation forms</li>
-  </ul>
-
-  <div class="stats">
-    <div class="stat">
-      <strong>100K+</strong>
-      <span>Monthly Users</span>
-    </div>
-    <div class="stat">
-      <strong>140+</strong>
-      <span>Countries</span>
-    </div>
-    <div class="stat">
-      <strong>10</strong>
-      <span>Languages</span>
-    </div>
-    <div class="stat">
-      <strong>0</strong>
-      <span>Data Saved</span>
-    </div>
-  </div>
-
-  <h2>How It Works</h2>
-  <p>Using AutoPDF Cloud is simple:</p>
-  <ol>
-    <li>Choose your language</li>
-    <li>Type your text or upload a file</li>
-    <li>Click "Generate" to download your PDF</li>
-    <li>Or use the bot to create many documents at once</li>
-  </ol>
-
-  <p>No software to install. No account to create. Just open your browser and start.</p>
-
-  <h2>Privacy and Trust</h2>
-  <p>We respect your privacy completely. When you use AutoPDF Cloud:</p>
-  <ul>
-    <li>Your files are processed in a secure, temporary space</li>
-    <li>Nothing is saved after you download</li>
-    <li>We don’t ask for your name, email, or any personal information</li>
-    <li>No tracking or ads in your documents</li>
-  </ul>
-
-  <h2>Why We Stay Free</h2>
-  <p>We keep AutoPDF Cloud free by showing a small, respectful ad banner at the bottom of the page. This ad never appears in your PDFs and helps us keep the service running for everyone.</p>
-
-  <h2>Our Promise to You</h2>
-  <p>AutoPDF Cloud will always be:</p>
-  <ul>
-    <li>100% free to use</li>
-    <li>Easy to understand</li>
-    <li>Fast and reliable</li>
-    <li>Private and secure</li>
-  </ul>
-
-  <p>We are here to help you get things done — quickly, professionally, and without worry.</p>
-
-  <p style="text-align:center;margin-top:50px;font-size:16px;">
-    <a href="/">← Start Creating PDFs</a> | 
-    <a href="/contact">Contact Us</a> | 
-    <a href="/privacy">Privacy Policy</a>
+  <p>
+    AutoPDF Cloud is a lightweight, privacy-minded web utility designed to produce
+    professional PDF documents instantly. Built as a single-person project and
+    continuously improved through user feedback, AutoPDF Cloud aims to deliver a
+    focused feature set: quick PDF generation from text, extraction of text from
+    uploaded PDFs, and batch creation of card-style PDF documents for professionals,
+    creators, small businesses, and students. The service emphasizes simplicity —
+    a clean interface, fast output, and predictable results — while preserving user
+    privacy and minimizing friction. This "About" page explains who we are, what we
+    value, and why AutoPDF Cloud might be the right tool for you.
   </p>
-</div>
+
+  <p>
+    The idea for AutoPDF Cloud began with a simple observation: many people need
+    to create professional-looking PDFs without installing heavy software or
+    paying for subscriptions. Teachers preparing certificates, small business owners
+    creating receipts, sellers producing product sheets, and freelancers delivering
+    proposals all needed a tool that is both accessible and capable. AutoPDF Cloud
+    was built to answer that need — a web-first PDF generator with batch and card
+    layouts, a fast authoring experience, and a design that feels modern and
+    trustworthy. The product is intentionally focused rather than feature-bloated:
+    instead of attempting to do everything, we do a few things very well.
+  </p>
+
+  <p>
+    AutoPDF Cloud is an individual project. The developer designs, codes, and
+    maintains the platform end-to-end. Because of this compact structure, decisions
+    are made quickly and updates are released regularly. Features are chosen based
+    on direct user feedback and real-world usage patterns. If you request a small
+    improvement and it fits the product direction, there is a good chance it will
+    be implemented quickly.
+  </p>
+
+  <p>
+    Our mission is simple: give people everywhere an easy, free, and reliable
+    way to create high-quality PDF documents. That mission is grounded in a few
+    core principles:
+  </p>
+
+  <ul style="margin:12px 0 12px 20px;color:var(--text);line-height:1.6">
+    <li><strong>Privacy first:</strong> Your content is processed temporarily. We do not store or sell your documents.</li>
+    <li><strong>Fast and lightweight:</strong> The interface works well on phones and low-bandwidth networks.</li>
+    <li><strong>Practical design:</strong> Output is professional by default — formatted text, card layouts for bulk PDFs, and a clear footer watermark.</li>
+    <li><strong>Accessible:</strong> No signup required; you can use the service instantly.</li>
+  </ul>
+
+  <p>
+    Although AutoPDF Cloud remains free to use, we show a modest and respectful ad
+    banner to help cover hosting costs and keep the service available to everyone.
+    Advertisements are never embedded inside the generated PDF files and do not
+    affect the layout or content of your documents. We are transparent about this
+    model: if you prefer an ad-free experience, a future premium tier will allow
+    that option.
+  </p>
+
+  <p>
+    We designed AutoPDF Cloud to be globally accessible. The interface is in English
+    by default, but the platform accepts text in any written language. In a future
+    update, additional interface languages will be added to broaden accessibility.
+    For now, international users may still create documents and use templates in any
+    language; the PDF output preserves the text you provide.
+  </p>
+
+  <p>
+    If you are a business user or developer and want to automate document creation
+    at scale, AutoPDF Cloud supports batch card generation. You can prepare a set
+    of cards (name, subject, date, details) and generate a single combined PDF where
+    each card appears as a clean, professional page. This workflow is especially
+    useful for certificates, product catalogs, receipts, personalized letters,
+    and repeated documents where manual editing would be time-consuming.
+  </p>
+
+  <p>
+    While AutoPDF Cloud is a single-person project, we take reliability seriously.
+    The service runs on secure servers, uses HTTPS exclusively when deployed, and
+    follows common best practices for data handling. Files are processed temporarily:
+    uploads are analyzed and text is extracted only to return results to the user,
+    and generated PDFs are delivered as a direct download.
+  </p>
+
+  <p>
+    If you have suggestions, bug reports, or specific feature requests, the best
+    way to reach us is by email. We read and respond to messages as quickly as
+    possible. Email: <a href="mailto:vofs.auto@gmail.com">vofs.auto@gmail.com</a>.
+    When contacting us, including a short description of your use case helps us
+    prioritize features that will benefit the most users.
+  </p>
+
+  <h3 style="color:var(--accent)">Advertiser Disclosure</h3>
+  <p>
+    AutoPDF Cloud displays advertising to support operations and hosting costs.
+    Ads are clearly separated from the service UI and are not embedded in generated
+    documents. We may display ads provided by third-party ad networks (for example,
+    Google AdSense). Displaying ads helps keep AutoPDF Cloud free for everyone.
+  </p>
+
+  <p>
+    Thank you for using AutoPDF Cloud. We hope it helps you create professional
+    documents quickly and with minimal effort. If you enjoy the service, sharing
+    with friends and colleagues helps the project grow and improves long-term
+    maintenance and feature development.
+  </p>
+</main>
+
+<footer>
+  <a href="/about">About</a> |
+  <a href="/contact">Contact</a> |
+  <a href="/privacy">Privacy</a> |
+  <a href="/terms">Terms</a>
+</footer>
+
 </body>
-  </html>
+    </html>
