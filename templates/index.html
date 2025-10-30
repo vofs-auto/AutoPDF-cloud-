@@ -1,329 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoPDF Cloud</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AutoPDF Cloud — Batch Cards</title>
   <style>
-    :root {
-      --bg:#0a0f1a;
-      --text:#dce3f0;
-      --accent:#00ffff;
-      --panel:#0f172a;
+    :root{
+      --bg:#071126; --card:#0f1b2b; --accent:#00e6ff; --muted:#9fb6c9; --good:#0f8a4a; --bad:#c62828;
       --btn:#00b7ff;
-      --banner:#1a0033;
-      --card:#0e182c;
     }
-
-    [data-theme="light"] {
-      --bg:#f8f9fc;
-      --text:#111;
-      --accent:#0077ff;
-      --panel:#e6e9f1;
-      --btn:#007bff;
-      --banner:#cfe2ff;
-      --card:#fff;
-    }
-
-    * { margin:0; padding:0; box-sizing:border-box; transition:all 0.3s ease; }
-    body {
-      font-family: 'Arial', sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      overflow-x:hidden;
-    }
-
-    header {
-      background:var(--panel);
-      color:var(--accent);
-      padding:14px;
-      text-align:center;
-      font-size:1rem;
-      font-weight:bold;
-      letter-spacing:0.5px;
-      box-shadow:0 2px 10px rgba(0,255,255,0.2);
-      position:relative;
-    }
-
-    .menu-icon {
-      position:absolute;
-      right:15px;
-      top:12px;
-      cursor:pointer;
-      font-size:20px;
-      color:var(--accent);
-    }
-
-    .tabs {
-      display:flex;
-      background:var(--panel);
-      border-bottom:1px solid #1e2d47;
-    }
-
-    .tab {
-      flex:1;
-      padding:12px;
-      text-align:center;
-      font-size:0.9rem;
-      color:#bbb;
-      cursor:pointer;
-      transition:0.3s;
-    }
-
-    .tab.active {
-      color:var(--accent);
-      border-bottom:3px solid var(--accent);
-      background:rgba(0,0,0,0.2);
-    }
-
-    .content {
-      flex:1;
-      padding:16px;
-      display:none;
-      overflow-y:auto;
-      scroll-behavior:smooth;
-    }
-
-    .content.active {
-      display:block;
-    }
-
-    .section {
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-top:10px;
-    }
-
-    input, textarea, button, select {
-      padding:10px;
-      border-radius:8px;
-      border:none;
-      font-size:14px;
-      background:var(--card);
-      color:var(--text);
-    }
-
-    textarea { resize:none; min-height:70px; }
-    button {
-      background:var(--btn);
-      color:white;
-      cursor:pointer;
-      transition:0.3s;
-    }
-
-    button:hover {
-      opacity:0.9;
-      transform:scale(1.03);
-    }
-
-    /* MENU DE CONFIGURAÇÕES */
-    #settingsPanel {
-      position:fixed;
-      top:0;
-      right:-280px;
-      width:260px;
-      height:100%;
-      background:var(--panel);
-      box-shadow:-2px 0 10px rgba(0,0,0,0.5);
-      padding:20px;
-      transition:0.4s;
-      display:flex;
-      flex-direction:column;
-      gap:15px;
-      z-index:20;
-    }
-
-    #settingsPanel.active { right:0; }
-
-    #settingsPanel h3 {
-      color:var(--accent);
-      text-align:center;
-      margin-bottom:10px;
-    }
-
-    .ad-banner {
-      position:fixed;
-      bottom:0;
-      left:0;
-      width:100%;
-      background:var(--banner);
-      color:var(--accent);
-      padding:8px;
-      text-align:center;
-      font-size:12px;
-      border-top:1px solid var(--accent);
-      z-index:10;
-    }
-
-    .ad-banner a { color:var(--accent); text-decoration:underline; }
-
-    footer {
-      text-align:center;
-      padding:15px;
-      font-size:12px;
-      color:#aaa;
-      background:var(--panel);
-      border-top:1px solid var(--accent);
-    }
-
-    footer a {
-      color:#aaa;
-      margin:0 10px;
-      text-decoration:none;
-      transition:0.3s;
-    }
-
-    footer a:hover { color:var(--accent); }
-
-    /* Responsivo */
-    @media (max-width:600px) {
-      body { font-size:14px; }
-      .tab { font-size:13px; padding:10px; }
-      header { font-size:15px; }
-      #settingsPanel { width:220px; }
-      .ad-banner { font-size:11px; padding:5px; }
-    }
-
-    @media (min-width:900px) {
-      .content { max-width:850px; margin:auto; }
-      textarea { min-height:100px; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:#e6f6ff;min-height:100vh;display:flex;flex-direction:column}
+    header{padding:14px 18px;background:linear-gradient(90deg,#00121f,#002b45);display:flex;align-items:center;justify-content:space-between}
+    header h1{font-size:1rem;margin:0;color:var(--accent)}
+    .top-right{display:flex;gap:8px;align-items:center}
+    .tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .tab{flex:1;padding:12px;text-align:center;cursor:pointer;background:transparent;color:var(--muted)}
+    .tab.active{color:var(--accent);border-bottom:3px solid var(--accent);background:linear-gradient(180deg,rgba(0,0,0,0.15),transparent)}
+    main{flex:1;display:flex;gap:18px;padding:16px;align-items:flex-start}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:14px;flex:1;min-width:260px}
+    .small{font-size:13px;color:var(--muted);margin-bottom:8px}
+    input,textarea,select,button{border-radius:8px;border:0;padding:10px;font-size:14px}
+    textarea{min-height:60px;background:#081626;color:inherit;resize:vertical}
+    .row{display:flex;gap:8px;margin-bottom:8px}
+    .row input{flex:1;background:#071826;color:inherit}
+    .actions{display:flex;gap:8px;align-items:center}
+    .btn{background:var(--btn);color:#001;padding:10px 12px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,183,255,0.12)}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.04)}
+    .list{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto;padding-right:6px}
+    .item{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));padding:12px;border-radius:10px;display:grid;grid-template-columns:1fr 80px;gap:8px;align-items:start}
+    .fields{display:flex;flex-direction:column;gap:8px}
+    .label{font-size:12px;color:var(--muted)}
+    .controls{display:flex;flex-direction:column;gap:8px;align-items:center}
+    .add{background:linear-gradient(90deg,#46d6aa,#17b978);color:#002;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700}
+    .remove{background:linear-gradient(90deg,#ff5454,#c62828);color:white;padding:6px 10px;border-radius:8px;cursor:pointer;border:0}
+    .limitNote{font-size:13px;color:#ffdca8;margin-top:6px}
+    .status{font-size:13px;color:var(--accent);margin-top:10px;text-align:center}
+    .ad-banner{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:#05041a;color:var(--accent);padding:10px 14px;border-radius:10px;border:1px solid rgba(0,230,255,0.06)}
+    footer{padding:10px 16px;text-align:center;color:#9fb6c9;font-size:13px}
+    @media (max-width:900px){
+      main{flex-direction:column}
+      .item{grid-template-columns:1fr;align-items:stretch}
+      .controls{flex-direction:row;justify-content:flex-end}
     }
   </style>
 </head>
-
 <body>
+  <header>
+    <h1>AutoPDF Cloud — Batch Cards</h1>
+    <div class="top-right">
+  <div style="font-size:13px;color:var(--muted)">Logged: Guest</div>
+  <div style="width:8px"></div>
+  <div title="PDFs generated" id="pdfCount" style="color:#00e6ff;font-weight:600;">PDFs: {{count}}</div>
+  <div style="width:8px"></div>
+  <div title="Settings">⚙️</div>
+    </div>
+  </header>
 
-<header>
-  AutoPDF Cloud
-  <div class="menu-icon" onclick="toggleSettings()">⚙️</div>
-</header>
-
-<div class="tabs">
-  <div class="tab active" onclick="openTab('pdf')">Gerar PDF</div>
-  <div class="tab" onclick="openTab('bot')">Batch PDF Bot</div>
-</div>
-
-<!-- TELA 1 -->
-<div id="pdf" class="content active">
-  <div class="section">
-    <input type="file" id="pdfFile" accept=".pdf">
-    <div style="font-size:13px;color:#aaa;">ou digite abaixo:</div>
-    <textarea id="pdfText" placeholder="Escreva seu texto aqui..."></textarea>
-    <button onclick="generatePDF()">Gerar PDF</button>
+  <div class="tabs">
+    <div class="tab active" onclick="openTab('pdf')">Generate PDF</div>
+    <div class="tab" onclick="openTab('batch')">Batch PDF Bot</div>
   </div>
-</div>
 
-<!-- TELA 2 -->
-<div id="bot" class="content">
-  <div class="section">
-    <h3 style="color:var(--accent);">Batch PDF Bot — Relatórios automáticos</h3>
-    <p style="font-size:13px;color:#aaa;">Preencha os campos abaixo:</p>
-    <label>Modelo:</label>
-    <textarea id="template" placeholder="Ex: Relatório de {{ nome }} sobre {{ assunto }} - Data: {{ data }}"></textarea>
-    <label>Lista (CSV):</label>
-    <textarea id="csv" placeholder="nome,assunto,data\nJoão,Marketing,01/01\nMaria,Vendas,02/01"></textarea>
-    <button onclick="runBot()">Gerar Relatórios</button>
-    <div id="status" style="color:var(--accent);font-size:13px;"></div>
-  </div>
-</div>
+  <main>
+    <!-- left: pdf single -->
+    <section class="panel" id="pdf" style="flex-basis:380px">
+      <div class="small">Single PDF — upload or type text</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <input type="file" id="pdfFile" accept=".pdf" />
+        <textarea id="pdfText" placeholder="Type content here..."></textarea>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="generatePDF()">Generate PDF</button>
+          <button class="btn ghost" onclick="clearSingle()">Clear</button>
+        </div>
+        <div class="small" style="margin-top:6px;color:var(--muted)">Works with uploaded PDF text extraction or typed content.</div>
+      </div>
+    </section>
 
-<!-- MENU CONFIGURAÇÕES -->
-<div id="settingsPanel">
-  <h3>Configurações ⚙️</h3>
-  <label for="themeSelect">Tema:</label>
-  <select id="themeSelect" onchange="changeTheme(this.value)">
-    <option value="auto">Automático</option>
-    <option value="dark">Escuro</option>
-    <option value="light">Claro</option>
-  </select>
+    <!-- right: batch -->
+    <section class="panel" id="batch" style="flex:2">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong style="color:var(--accent)">Batch PDF Creator (cards)</strong><div class="small">Max 82 entries — one card per PDF page</div></div>
+        <div class="actions">
+          <button class="add" id="addBtn">+ Add Entry</button>
+          <button class="btn" id="generateBatch">Generate Batch PDF</button>
+        </div>
+      </div>
 
-  <label for="langSelect">Idioma:</label>
-  <select id="langSelect">
-    <option>English</option>
-    <option>Português</option>
-    <option>Español</option>
-    <option>Français</option>
-    <option>Deutsch</option>
-    <option>Italiano</option>
-    <option>日本語</option>
-    <option>한국어</option>
-    <option>中文</option>
-    <option>Русский</option>
-  </select>
+      <div class="list" id="entries"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div class="limitNote">Limit: <strong id="count">0</strong> / 82</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="loadExample()">Load Example</button>
+          <button class="btn ghost" onclick="clearAll()">Clear All</button>
+        </div>
+      </div>
+      <div id="batchStatus" class="status"></div>
+    </section>
+  </main>
 
-  <p style="font-size:12px;color:#aaa;margin-top:10px;">
-    As mudanças são salvas automaticamente.
-  </p>
-</div>
+  <div class="ad-banner">AD:</div>
 
-<!-- Banner -->
-<div class="ad-banner">
-  <strong>AD:</strong> Get 1TB Cloud for $5/mo → <a href="#">Click here</a>
-</div>
-
-<!-- Rodapé -->
-<footer>
-  <a href="/about">About</a> |
-  <a href="/contact">Contact</a> |
-  <a href="/privacy">Privacy</a> |
-  <a href="/terms">Terms</a>
-</footer>
+  <footer>
+    <a href="/about">About</a> • <a href="/contact">Contact</a> • <a href="/privacy">Privacy</a> • <a href="/terms">Terms</a>
+  </footer>
 
 <script>
-function openTab(id) {
-  document.querySelectorAll('.tab,.content').forEach(e=>e.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById(id).classList.add('active');
+/* CORE: manage entries up to 82 */
+const MAX = 82;
+let idx = 0;
+const list = document.getElementById('entries');
+const countEl = document.getElementById('count');
+const statusEl = document.getElementById('batchStatus');
+
+function updateCount(){ countEl.textContent = list.children.length; }
+
+function makeItem(data){
+  idx++;
+  const id = 'it'+idx;
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.id = id;
+  div.innerHTML = `
+    <div class="fields">
+      <div class="label">Assunto (subject)</div>
+      <input placeholder="Ex: Product Brief" class="subject" value="${data?.subject||''}"/>
+      <div class="label">Nome (name)</div>
+      <input placeholder="Ex: Victor Octavio" class="name" value="${data?.name||''}"/>
+      <div class="label">Data (date)</div>
+      <input placeholder="Ex: 08/12/2024" class="date" value="${data?.date||''}"/>
+      <div class="label">Detalhes (optional)</div>
+      <textarea class="details" placeholder="Additional info: product, career, notes...">${data?.details||''}</textarea>
+    </div>
+    <div class="controls">
+      <button class="add" title="Add page" onclick="addNear('${id}')">+ Add</button>
+      <button class="remove" title="Remove page" onclick="removeItem('${id}')">− Remove</button>
+    </div>
+  `;
+  return div;
 }
 
-function toggleSettings(){
-  document.getElementById("settingsPanel").classList.toggle("active");
+function addItemAtEnd(data){
+  if(list.children.length >= MAX){ alert('Max entries reached: '+MAX); return; }
+  const it = makeItem(data);
+  list.appendChild(it);
+  updateCount();
+}
+function addNear(id){
+  if(list.children.length >= MAX){ alert('Max reached'); return; }
+  const ref = document.getElementById(id);
+  const next = ref.nextSibling;
+  const it = makeItem();
+  if(next) list.insertBefore(it, next); else list.appendChild(it);
+  updateCount();
+}
+function removeItem(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.remove();
+  updateCount();
+}
+document.getElementById('addBtn').addEventListener('click', ()=>addItemAtEnd());
+
+function clearAll(){ if(confirm('Clear all entries?')){ list.innerHTML=''; updateCount(); statusEl.textContent=''; } }
+function clearSingle(){ document.getElementById('pdfText').value=''; }
+
+function loadExample(){
+  clearAll();
+  addItemAtEnd({subject:'Curriculum - Developer',name:'Victor Octavio',date:'08/12/2024',details:'Full-stack developer'});
+  addItemAtEnd({subject:'Product Brief',name:'Widget 3000',date:'01/01/2025',details:'Specs and pricing'});
+  statusEl.textContent='Loaded 2 example entries';
 }
 
-function changeTheme(mode){
-  if(mode==="auto"){
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.body.dataset.theme = prefersDark ? "dark" : "light";
-  } else {
-    document.body.dataset.theme = mode;
+/* collect rows and POST JSON to backend */
+async function generateBatch(){
+  const items = Array.from(list.children);
+  if(items.length===0){ alert('Add at least 1 entry'); return; }
+  const rows = [];
+  for(const it of items){
+    const subject = it.querySelector('.subject').value.trim();
+    const name = it.querySelector('.name').value.trim();
+    const date = it.querySelector('.date').value.trim();
+    const details = it.querySelector('.details').value.trim();
+    rows.push({subject,name,date,details});
   }
-  localStorage.setItem("theme", mode);
+  statusEl.textContent='Generating PDF — please wait...';
+  document.getElementById('generateBatch').disabled = true;
+
+  try{
+    const res = await fetch('/generate_batch', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({rows})
+    });
+    if(!res.ok){ const err = await res.text(); throw new Error(err||'Server error'); }
+    const blob = await res.blob();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'batch_cards.pdf'; a.click();
+    statusEl.textContent = '✅ Batch PDF generated';
+  }catch(e){
+    statusEl.textContent = 'Error: '+e.message;
+  }finally{
+    document.getElementById('generateBatch').disabled = false;
+  }
 }
 
-// Recupera o tema salvo
-const savedTheme = localStorage.getItem("theme") || "auto";
-changeTheme(savedTheme);
-document.getElementById("themeSelect").value = savedTheme;
+/* wire buttons */
+document.getElementById('generateBatch').addEventListener('click', generateBatch);
 
-async function generatePDF() {
+/* small PDF single generator using existing endpoints (keeps old behavior) */
+async function generatePDF(){
   const file = document.getElementById('pdfFile').files[0];
-  if (file) {
+  if(file){
     const form = new FormData(); form.append('file', file);
-    const res = await fetch('/upload_pdf', {method:'POST', body:form});
-    const data = await res.json();
-    document.getElementById('pdfText').value = data.text || '';
+    const r = await fetch('/upload_pdf', {method:'POST', body:form});
+    const j = await r.json(); document.getElementById('pdfText').value = j.text || '';
   }
-  const form = new FormData();
-  form.append('text', document.getElementById('pdfText').value || 'Hello');
-  const res = await fetch('/generate_pdf', {method:'POST', body:form});
-  const blob = await res.blob();
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'document.pdf'; a.click();
+  const form = new FormData(); form.append('text', document.getElementById('pdfText').value || 'Hello');
+  const r2 = await fetch('/generate_pdf', {method:'POST', body:form});
+  const blob = await r2.blob(); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='document.pdf'; a.click();
 }
 
-async function runBot() {
-  const form = new FormData();
-  form.append('template', document.getElementById('template').value);
-  form.append('csv', document.getElementById('csv').value);
-  const res = await fetch('/generate_batch', {method:'POST', body:form});
-  const blob = await res.blob();
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'relatorios.zip'; a.click();
-  document.getElementById('status').textContent = "✔️ Relatórios prontos para download.";
+/* init */
+updateCount();
+  async function refreshCounter(){
+  try{
+    const res = await fetch('/counter');
+    const j = await res.json();
+    document.getElementById('pdfCount').textContent = "PDFs: " + j.count;
+  }catch(e){}
 }
+setInterval(refreshCounter, 6000);
 </script>
-
 </body>
-  </html>
+          </html>
