@@ -366,5 +366,40 @@ function closePage() {
   document.getElementById("pageModal").style.display = "none";
 }
 </script>
+  <!-- Cookie Consent Banner -->
+<div id="cookie-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#111; color:#fff; padding:14px; text-align:center; font-size:14px; z-index:9999;">
+  This site uses cookies to enhance your experience and support ads. 
+  <a href="/cookies" style="color:#00e6ff; text-decoration:underline;">Learn more</a>
+  <button id="accept-cookies" style="margin-left:10px; background:#00e6ff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Accept</button>
+</div>
+
+<script>
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days*24*60*60*1000));
+    document.cookie = name + "=" + value + ";expires=" + d.toUTCString() + ";path=/";
+  }
+
+  function getCookie(name) {
+    const n = name + "=";
+    const decoded = decodeURIComponent(document.cookie);
+    const ca = decoded.split(';');
+    for(let c of ca) {
+      c = c.trim();
+      if (c.indexOf(n) == 0) return c.substring(n.length, c.length);
+    }
+    return "";
+  }
+
+  window.addEventListener("load", () => {
+    if (!getCookie("cookieAccepted")) {
+      document.getElementById("cookie-banner").style.display = "block";
+    }
+    document.getElementById("accept-cookies").addEventListener("click", () => {
+      setCookie("cookieAccepted", "yes", 365);
+      document.getElementById("cookie-banner").style.display = "none";
+    });
+  });
+</script>
 </body>
   </html>
