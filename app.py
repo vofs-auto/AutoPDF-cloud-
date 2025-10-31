@@ -1,131 +1,223 @@
-from flask import Flask, render_template, request, send_file, jsonify
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib.colors import Color, black
+from flask import Flask, render_template_string, request, send_file, jsonify
 from io import BytesIO
 from datetime import datetime
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import Paragraph, Frame, Spacer
+from PyPDF2 import PdfReader
+import os
 import json
 
 app = Flask(__name__)
 
-# Counter variable (in-memory)
+# --- Counter & Stats ---
 pdf_counter = 0
+stats = {
+    "total": 0,
+    "today": 0,
+    "users": 0
+}
 
-@app.route("/")
-def index():
-    return render_template("index.html", count=pdf_counter)
-
-@app.route("/generate_pdf", methods=["POST"])
-def generate_pdf():
-    global pdf_counter
-    text = request.form.get("text", "").strip()
-    if not text:
-        return "No text provided", 400
-
+# --- PDF Generation ---
+def create_professional_pdf(title, content, date="", author="", watermark="AutoPDF Cloud"):
+    """Generate a beautiful professional PDF with hierarchy and watermark."""
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
 
-    # Create blue gradient background
-    for i in range(100):
-        shade = 1 - (i / 120.0)
-        c.setFillColorRGB(0.8 - (i/300.0), 0.9 - (i/250.0), 1)
-        c.rect(0, (A4[1]/100)*i, A4[0], A4[1]/100, fill=1, stroke=0)
+    # Background color
+    c.setFillColorRGB(0.97, 0.97, 0.97)
+    c.rect(0, 0, width, height, fill=True, stroke=False)
 
-    c.setFillColor(black)
-    c.setFont("Helvetica", 12)
-    text_obj = c.beginText(50, 800)
-    for line in text.splitlines():
-        text_obj.textLine(line)
-    c.drawText(text_obj)
+    # Frame for content
+    margin = 50
+    frame_width = width - 2 * margin
+    frame_height = height - 2 * margin
 
-    # Add watermark
-    c.setFont("Helvetica-Oblique", 10)
-    c.setFillColorRGB(0.2, 0.2, 0.2)
-    c.drawRightString(A4[0] - 20, 20, "AutoPDF Cloud – https://autopdf-cloud-awgq.onrender.com")
+    # --- Header Title ---
+    c.setFont("Helvetica-Bold", 20)
+    c.setFillColor(colors.HexColor("#003366"))
+    c.drawString(margin, height - 80, title[:80])
+
+    # --- Author & Date ---
+    c.setFont("Helvetica-Oblique", 11)
+    c.setFillColor(colors.HexColor("#444444"))
+    if author:
+        c.drawString(margin, height - 100, f"Author: {author}")
+    if date:
+        c.drawRightString(width - margin, height - 100, f"Date: {date}")
+
+    # --- Content Frame ---
+    styles = getSampleStyleSheet()
+    body_style = ParagraphStyle(
+        'Body',
+        parent=styles['Normal'],
+        fontName="Helvetica",
+        fontSize=12,
+        leading=18,
+        textColor=colors.HexColor("#222222"),
+    )
+
+    text = Paragraph(content.replace("\n", "<br/>"), body_style)
+    frame = Frame(margin, margin + 60, frame_width, frame_height - 130, showBoundary=0)
+    frame.addFromList([text, Spacer(1, 12)], c)
+
+    # --- Watermark ---
+    c.saveState()
+    c.setFont("Helvetica-BoldOblique", 36)
+    c.setFillColorRGB(0.5, 0.5, 0.5, alpha=0.15)  # translucent
+    c.drawRightString(width - 30, 40, watermark)
+    c.restoreState()
 
     c.showPage()
     c.save()
-
     buffer.seek(0)
+    return buffer
+
+
+# --- Routes ---
+@app.route("/")
+def index():
+    return render_template_string(open("templates/index.html").read(), count=pdf_counter)
+
+
+@app.route("/generate_pdf", methods=["POST"])
+def generate_pdf():
+    global pdf_counter, stats
+    text = request.form.get("text", "").strip()
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
     pdf_counter += 1
-    return send_file(buffer, as_attachment=True, download_name="AutoPDF.pdf", mimetype="application/pdf")
+    stats["total"] += 1
+    stats["today"] += 1
+
+    now = datetime.now().strftime("%d %B %Y")
+    pdf_buffer = create_professional_pdf(
+        title="Document",
+        content=text,
+        date=now,
+        author="AutoPDF User"
+    )
+
+    return send_file(pdf_buffer, as_attachment=True, download_name="document.pdf", mimetype="application/pdf")
+
+
+@app.route("/upload_pdf", methods=["POST"])
+def upload_pdf():
+    file = request.files.get("file")
+    if not file:
+        return jsonify({"error": "No file uploaded"})
+    try:
+        reader = PdfReader(file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+        return jsonify({"text": text.strip()})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
 
 @app.route("/generate_batch", methods=["POST"])
 def generate_batch():
-    global pdf_counter
+    global pdf_counter, stats
     data = request.get_json()
     rows = data.get("rows", [])
     if not rows:
-        return "No data received", 400
+        return jsonify({"error": "No batch data"}), 400
 
-    buffer = BytesIO()
-    c = canvas.Canvas(buffer, pagesize=A4)
+    merged = BytesIO()
+    c = canvas.Canvas(merged, pagesize=A4)
+    width, height = A4
 
     for row in rows:
-        # Blue gradient background
-        for i in range(100):
-            shade = 1 - (i / 120.0)
-            c.setFillColorRGB(0.8 - (i/300.0), 0.9 - (i/250.0), 1)
-            c.rect(0, (A4[1]/100)*i, A4[0], A4[1]/100, fill=1, stroke=0)
+        name = row.get("name", "")
+        subject = row.get("subject", "")
+        date = row.get("date", "")
+        details = row.get("details", "")
 
-        c.setFont("Helvetica-Bold", 16)
-        c.setFillColor(black)
-        c.drawCentredString(A4[0]/2, 780, "AutoPDF Cloud Report")
+        c.setFillColorRGB(0.97, 0.97, 0.97)
+        c.rect(0, 0, width, height, fill=True, stroke=False)
 
-        c.setFont("Helvetica", 12)
-        y = 740
-        fields = [
-            ("Name / Product", row.get("name", "")),
-            ("Title / Subject", row.get("subject", "")),
-            ("Date", row.get("date", "")),
-            ("Details", row.get("details", "")),
-        ]
-        for label, value in fields:
-            c.drawString(80, y, f"{label}:")
-            c.drawString(220, y, value)
-            y -= 24
+        # Header
+        c.setFont("Helvetica-Bold", 22)
+        c.setFillColor(colors.HexColor("#004488"))
+        c.drawString(60, height - 80, name[:80])
+
+        # Subtitle
+        c.setFont("Helvetica-Bold", 14)
+        c.setFillColor(colors.HexColor("#222222"))
+        c.drawString(60, height - 110, subject)
+
+        # Date
+        c.setFont("Helvetica-Oblique", 11)
+        c.setFillColor(colors.HexColor("#555555"))
+        c.drawRightString(width - 60, height - 110, date)
+
+        # Body
+        styles = getSampleStyleSheet()
+        body_style = ParagraphStyle(
+            'Body',
+            parent=styles['Normal'],
+            fontName="Helvetica",
+            fontSize=12,
+            leading=18,
+            textColor=colors.HexColor("#222222"),
+        )
+        text = Paragraph(details.replace("\n", "<br/>"), body_style)
+        frame = Frame(60, 80, width - 120, height - 220, showBoundary=0)
+        frame.addFromList([text], c)
 
         # Watermark
-        c.setFont("Helvetica-Oblique", 10)
-        c.setFillColorRGB(0.2, 0.2, 0.2)
-        c.drawRightString(A4[0] - 20, 20, "AutoPDF Cloud – https://autopdf-cloud-awgq.onrender.com")
+        c.saveState()
+        c.setFont("Helvetica-BoldOblique", 34)
+        c.setFillColorRGB(0.5, 0.5, 0.5, alpha=0.13)
+        c.drawRightString(width - 30, 40, "AutoPDF Cloud")
+        c.restoreState()
 
         c.showPage()
 
     c.save()
-    buffer.seek(0)
+    merged.seek(0)
+
     pdf_counter += len(rows)
-    return send_file(buffer, as_attachment=True, download_name="Batch_AutoPDF.pdf", mimetype="application/pdf")
+    stats["total"] += len(rows)
+    stats["today"] += len(rows)
+
+    return send_file(merged, as_attachment=True, download_name="batch_cards.pdf", mimetype="application/pdf")
+
 
 @app.route("/counter")
 def counter():
     return jsonify({"count": pdf_counter})
 
+
 @app.route("/admin_stats")
 def admin_stats():
-    today = datetime.now().strftime("%Y-%m-%d")
-    return jsonify({
-        "total": pdf_counter,
-        "today": today,
-        "users": "Active visitors mode"
-    })
+    return jsonify(stats)
 
-# Static pages
+
+# --- Pages ---
 @app.route("/about")
 def about():
-    return render_template("about.html")
-
-@app.route("/contact")
-def contact():
-    return render_template("contact.html")
+    return "<h3>About AutoPDF Cloud</h3><p>A modern PDF generator for professionals, eBooks, resumes and digital documents.</p>"
 
 @app.route("/privacy")
 def privacy():
-    return render_template("privacy.html")
+    return "<h3>Privacy Policy</h3><p>We respect your privacy. No document data is stored on our servers.</p>"
 
 @app.route("/terms")
 def terms():
-    return render_template("terms.html")
+    return "<h3>Terms of Service</h3><p>Use AutoPDF Cloud responsibly for legal and creative purposes.</p>"
+
+@app.route("/contact")
+def contact():
+    return "<h3>Contact</h3><p>Email: support@autopdfcloud.com</p>"
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
