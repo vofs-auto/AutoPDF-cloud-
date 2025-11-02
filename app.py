@@ -6,6 +6,11 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, Frame, Spacer
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+
+# Registra uma fonte compatível com acentos, emojis e caracteres especiais
+pdfmetrics.registerFont(UnicodeCIDFont('STSong-Light'))
 from PyPDF2 import PdfReader
 import os, json
 
@@ -29,13 +34,48 @@ def reset_daily_stats():
         stats["last_reset"] = str(date.today())
 
 # --- PDF Generation (Clean Version) ---
-def create_professional_pdf(content, watermark="AutoPDF Cloud"):
+
+    def create_professional_pdf(content, watermark="AutoPDF Cloud"):
     """Generate a clean professional PDF (no title/author pollution)."""
-    import html
-    content = html.escape(content)  # Protege caracteres especiais (ex: <, >, &)
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
+
+    # Fundo branco claro
+    c.setFillColorRGB(0.97, 0.97, 0.97)
+    c.rect(0, 0, width, height, fill=True, stroke=False)
+
+    # Estilo de texto com suporte total a Unicode
+    styles = getSampleStyleSheet()
+    body_style = ParagraphStyle(
+        'Body',
+        parent=styles['Normal'],
+        fontName="STSong-Light",  # ✅ suporta acentos e emojis
+        fontSize=12,
+        leading=18,
+        textColor=colors.HexColor("#222222"),
+    )
+
+    # Escapar caracteres problemáticos e formatar quebras de linha
+    safe_content = content.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br/>")
+    text = Paragraph(safe_content, body_style)
+
+    # Área de texto
+    frame = Frame(50, 80, width - 100, height - 150, showBoundary=0)
+    frame.addFromList([text, Spacer(1, 12)], c)
+
+    # Marca d'água
+    c.saveState()
+    c.setFont("Helvetica-BoldOblique", 34)
+    c.setFillColorRGB(0.5, 0.5, 0.5, alpha=0.13)
+    c.drawRightString(width - 30, 40, watermark)
+    c.restoreState()
+
+    # Finalizar PDF
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer
 
     # Background
     c.setFillColorRGB(0.97, 0.97, 0.97)
