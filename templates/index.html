@@ -179,17 +179,32 @@
 <script>
 function toggleTheme() { document.body.classList.toggle("light-mode"); }
 
-// ✅ Função de gerar PDF (mantida versão com barra de progresso)
 async function generatePDF() {
-  const text = document.getElementById("textInput").value;
+  let text = document.getElementById("textInput").value;
+
+  // 🧩 Se houver blocos em modo card, junta tudo num único texto
+  const cards = document.querySelectorAll(".batch-block");
+  if (cards.length > 0) {
+    text = "";
+    cards.forEach((card, i) => {
+      const inputs = card.querySelectorAll("input, textarea");
+      const name = inputs[0].value || "No name";
+      const title = inputs[1].value || "Untitled";
+      const date = inputs[2].value || "No date";
+      const details = inputs[3].value || "No details";
+      text += `\n\n🗂️ Card ${i + 1}\nName: ${name}\nTitle: ${title}\nDate: ${date}\nDetails:\n${details}\n`;
+    });
+  }
+
   if (!text.trim()) return alert("Please type something first!");
 
+  // 🔄 Barra de progresso igual antes
   const overlay = document.createElement("div");
   overlay.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:10000;";
   const barContainer = document.createElement("div");
   barContainer.style = "width:300px;height:12px;border:2px solid #00ccff;border-radius:10px;overflow:hidden;background:#111;";
   const bar = document.createElement("div");
-  bar.style = "width:0%;height:100%;background:linear-gradient(90deg,#00ccff,#7b2ff7);transition:width 1.s ease;";
+  bar.style = "width:0%;height:100%;background:linear-gradient(90deg,#00ccff,#7b2ff7);transition:width 1s ease;";
   const msg = document.createElement("p");
   msg.textContent = "⚙️ Generating PDF...";
   msg.style = "color:#00e6ff;margin-top:15px;font-family:Inter,sans-serif;font-size:14px;text-align:center;";
@@ -213,21 +228,21 @@ async function generatePDF() {
     clearInterval(interval);
     bar.style.width = "100%";
     msg.textContent = "✅ PDF ready!";
-    
-    // 🔊 Som de confirmação (PDF pronto)
-const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_49c181d6a4.mp3?filename=success-1-6297.mp3");
-audio.volume = 0.4;
-audio.play().catch(()=>{});
+
+    const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_49c181d6a4.mp3?filename=success-1-6297.mp3");
+    audio.volume = 0.4;
+    audio.play().catch(()=>{});
 
     if (res.ok) {
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "document.pdf";
+      a.download = "batch_document.pdf";
       a.click();
       refreshCounter();
     } else alert("Error generating PDF!");
   } catch (e) { alert("Error: " + e.message); }
+
   setTimeout(() => overlay.remove(), 2000);
 }
 
