@@ -59,7 +59,7 @@
     }
     textarea, input {
       width: 100%;
-      background-color: #0d1117;
+      background-color: #0d1107;
       color: var(--text);
       border: 1px solid #30363d;
       border-radius: 8px;
@@ -191,17 +191,17 @@
     footer {
   margin-bottom: 80px; /* empurra o rodapé um pouco pra cima */
 }
-    .info-text {
-  font-size: 1em;
-  color: #f0ff;
-  text-align: center;
-  margin-top: 8px;
-  margin-bottom: 15px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  line-height: 1.3;
-  display: block;
-      }
+.info-text {
+  max-width: 900px;       /* controla a largura máxima */
+  margin: 5px auto;      /* centraliza e dá espaço acima/abaixo */
+  text-align: center;     /* centraliza o texto */
+  font-size: 1em;       /* aumenta levemente o tamanho da letra */
+  background: #1a0066 ;    /* adiciona fundo leve (opcional) */
+  padding: 10px 15px;     /* espaço interno */
+  border-radius: 50px;     /* cantos arredondados */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* sombra leve */
+  color: #f0f;
+}
     
   </style>
 </head>
@@ -233,7 +233,7 @@ Generate PDFs fast ⚡ and free — all downloads are stored directly on your de
   <hr>
 
   <h2>Batch PDF Bot (Card Mode)</h2>
-  <p style="color:var(--muted);font-size:13px;">Fill up to 82 cards of information. Each card creates one PDF automatically.</p>
+  <p style="color:#f0ff; font-weight:bold;">⚡ Fast and unlimited PDF generation</p>
 
   <div id="batchContainer"></div>
   <button class="add-row-btn" onclick="addRow()">+ Add Card</button>
@@ -433,3 +433,4 @@ function closePage() {
 </script>
 </body>
   </html>
+  
