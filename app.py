@@ -212,6 +212,17 @@ def terms():
 def contact():
     return render_template("contact.html")
 
+@app.route('/cookies')
+def cookies():
+    return render_template('cookies.html')
+
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
+
+@app.route('/disclaimer')
+def disclaimer():
+    return render_template('disclaimer.html')
 
 # --- Theme handling via cookie ---
 @app.route("/set_theme/<mode>")
