@@ -64,7 +64,7 @@ def reset_daily_stats():
     frame = Frame(50, 80, width - 100, height - 150, showBoundary=0)
     frame.addFromList([text, Spacer(1, 12)], c)
 
-    # Marca d'água
+    # Marca d'água discreta
     c.saveState()
     c.setFont("Helvetica-BoldOblique", 34)
     c.setFillColorRGB(0.5, 0.5, 0.5, alpha=0.13)
@@ -76,37 +76,6 @@ def reset_daily_stats():
     c.save()
     buffer.seek(0)
     return buffer
-
-    # Background
-    c.setFillColorRGB(0.97, 0.97, 0.97)
-    c.rect(0, 0, width, height, fill=True, stroke=False)
-
-    # Text Frame
-    styles = getSampleStyleSheet()
-    body_style = ParagraphStyle(
-        'Body',
-        parent=styles['Normal'],
-        fontName="Helvetica",
-        fontSize=12,
-        leading=18,
-        textColor=colors.HexColor("#222222"),
-    )
-    text = Paragraph(content.replace("\n", "<br/>"), body_style)
-    frame = Frame(50, 80, width - 100, height - 150, showBoundary=0)
-    frame.addFromList([text, Spacer(1, 12)], c)
-
-    # Watermark
-    c.saveState()
-    c.setFont("Helvetica-BoldOblique", 34)
-    c.setFillColorRGB(0.5, 0.5, 0.5, alpha=0.13)
-    c.drawRightString(width - 30, 40, watermark)
-    c.restoreState()
-
-    c.showPage()
-    c.save()
-    buffer.seek(0)
-    return buffer
-
 
 # --- Routes ---
 @app.route("/")
