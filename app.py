@@ -10,6 +10,8 @@ from PyPDF2 import PdfReader
 import os, json
 
 app = Flask(__name__)
+# Aumentar limite de upload e dados postados para 100 MB
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100 MB
 
 # --- Counters & Stats ---
 pdf_counter = 0
