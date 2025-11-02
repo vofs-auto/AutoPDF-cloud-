@@ -31,6 +31,8 @@ def reset_daily_stats():
 # --- PDF Generation (Clean Version) ---
 def create_professional_pdf(content, watermark="AutoPDF Cloud"):
     """Generate a clean professional PDF (no title/author pollution)."""
+    import html
+    content = html.escape(content)  # Protege caracteres especiais (ex: <, >, &)
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
