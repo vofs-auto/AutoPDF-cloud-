@@ -11,7 +11,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from PyPDF2 import PdfReader
 import os, json
 
-# ✅ Registrar fonte NotoSans (compatível com acentos e emojis)
+# ✅ Registrar fonte NotoSans (compatível com acentos, emojis e ótimo para negócios)
 pdfmetrics.registerFont(TTFont('NotoSans', 'NotoSans-Regular.ttf'))
 
 app = Flask(__name__)
@@ -50,9 +50,9 @@ def create_professional_pdf(content, watermark="AutoPDF Cloud"):
     body_style = ParagraphStyle(
         "Body",
         parent=styles["Normal"],
-        fontName="STSong-Light",
-        fontSize=12,
-        leading=18,
+        fontName="NotoSans",
+        fontSize=15,
+        leading=22,
         textColor=colors.HexColor("#222222"),
     )
 
