@@ -7,9 +7,12 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, Frame, Spacer
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+from reportlab.pdfbase.ttfonts import TTFont
 from PyPDF2 import PdfReader
 import os, json
+
+# ✅ Registrar fonte NotoSans (compatível com acentos e emojis)
+pdfmetrics.registerFont(TTFont('NotoSans', 'NotoSans-Regular.ttf'))
 
 app = Flask(__name__)
 
