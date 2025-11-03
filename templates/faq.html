@@ -1,21 +1,82 @@
-<h2>Frequently Asked Questions (FAQ)</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FAQ - AutoPDF Cloud</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="index,follow" />
+  <style>
+    :root{--bg:#0d1117;--card:#161b22;--text:#e6edf3;--accent:#00e6ff;--muted:#8b949e}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+    header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--card);border-bottom:1px solid #1f2937}
+    header h1{color:var(--accent);font-size:20px}
+    .top-right{display:flex;gap:12px;align-items:center;color:var(--muted)}
+    #ad-banner{background:#1a0033;padding:8px;border-bottom:1px solid #1f2937;min-height:60px;position:sticky;top:48px;z-index:20}
+    .container{max-width:950px;margin:28px auto;padding:22px;background:var(--card);border-radius:14px;box-shadow:0 0 14px rgba(0,0,0,0.4)}
+    h2, h3{color:var(--accent);margin-bottom:12px}
+    p{line-height:1.7;margin:12px 0;color:var(--text)}
+    ul{margin:12px 0 12px 20px;color:var(--text);line-height:1.6}
+    footer{padding:15px;text-align:center;color:var(--muted);border-top:1px solid #1f2937;margin-top:30px}
+    a{color:var(--muted)}
+  </style>
+</head>
+<body>
+<header>
+  <h1>AutoPDF Cloud</h1>
+  <div class="top-right">
+    <span>User: Guest</span>
+    <span id="pdfCount">PDFs: {{count}}</span>
+    <span style="cursor:pointer" onclick="window.location='/';">🏠</span>
+  </div>
+</header>
 
-<h3>1. What is AutoPDF Cloud?</h3>
-<p>AutoPDF Cloud is a free web-based tool that allows users to generate, upload, and combine PDF files easily and securely.</p>
+<div id="ad-banner"><!-- ad slot: paste AdSense or other ad code here --></div>
 
-<h3>2. Do I need to create an account?</h3>
-<p>No. AutoPDF Cloud is completely free and anonymous — no registration or login is required.</p>
+<main class="container">
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <p><strong>Last Updated:</strong> October 2025</p>
 
-<h3>3. Is my data stored?</h3>
-<p>No. Uploaded files and generated PDFs are processed temporarily and deleted automatically. We never store user data permanently.</p>
+  <h3>1. What is AutoPDF Cloud?</h3>
+  <p>AutoPDF Cloud is a free, web-based tool that allows users to generate, upload, and combine PDF files easily and securely. It is designed for both beginners and professionals who need a lightweight, fast, and privacy-focused solution for PDF creation and management.</p>
 
-<h3>4. Can I use AutoPDF Cloud for work or business?</h3>
-<p>Yes, AutoPDF Cloud can be used for both personal and professional purposes.</p>
+  <h3>2. Do I need to create an account?</h3>
+  <p>No. AutoPDF Cloud is completely free and anonymous — no registration or login is required. You can start generating PDFs instantly without sharing personal information.</p>
 
-<h3>5. Why do I see ads?</h3>
-<p>Ads help us keep AutoPDF Cloud free for all users. We use Google AdSense for displaying advertisements responsibly.</p>
+  <h3>3. Is my data stored?</h3>
+  <p>No. Uploaded files and generated PDFs are processed temporarily and deleted automatically after the operation completes. We do not store user data permanently, ensuring that your documents remain private and secure.</p>
 
-<h3>6. How can I contact support?</h3>
-<p>If you need help, please reach us via email at 
-<a href="mailto:vofs.auto@gmail.com">vofs.auto@gmail.com</a>.
-We’ll respond as soon as possible.</p>
+  <h3>4. Can I use AutoPDF Cloud for work or business?</h3>
+  <p>Yes, AutoPDF Cloud can be used for both personal and professional purposes. Whether you need to generate certificates, invoices, product sheets, or proposals, our platform provides a fast and reliable solution for individual users, small businesses, and freelancers.</p>
+
+  <h3>5. Why do I see ads?</h3>
+  <p>Ads help us keep AutoPDF Cloud free for everyone. We use Google AdSense to display advertising in a responsible and non-intrusive manner. Advertisements are not embedded inside the generated PDF files and do not affect your document layout.</p>
+
+  <h3>6. How can I contact support?</h3>
+  <p>If you need assistance, have questions, or want to report a bug, please reach us via email at 
+    <a href="mailto:vofs.auto@gmail.com">vofs.auto@gmail.com</a>. We usually respond within 24–48 hours on business days. Providing a brief description of your issue or use case helps us assist you faster.</p>
+
+  <h3>7. Are there limits on file size or number of PDFs?</h3>
+  <p>AutoPDF Cloud allows uploading and generating PDFs with reasonable limits to ensure stable performance. Extremely large files or excessive batch uploads may be temporarily restricted to maintain service quality for all users.</p>
+
+  <h3>8. Is AutoPDF Cloud secure?</h3>
+  <p>Yes. All file uploads and downloads occur over HTTPS. Files are processed temporarily in memory and never stored permanently. Security best practices are followed to protect your data during processing.</p>
+
+  <h3>9. Can I generate PDFs in languages other than English?</h3>
+  <p>Absolutely. AutoPDF Cloud supports text in any written language. PDFs preserve the text exactly as provided. Future updates will add more interface languages to make the service accessible globally.</p>
+
+  <h3>10. Are there plans for premium features?</h3>
+  <p>Currently, AutoPDF Cloud is free. In the future, a premium tier may be offered, providing features such as ad-free experience, priority support, and enhanced batch processing. Any new features will be clearly communicated on the website.</p>
+
+  <p>Thank you for using AutoPDF Cloud. We hope this FAQ helps you understand how to make the most of our service. Sharing the tool with friends and colleagues helps the project grow and improve long-term.</p>
+</main>
+
+<footer>
+  <a href="/about">About</a> |
+  <a href="/contact">Contact</a> |
+  <a href="/privacy">Privacy</a> |
+  <a href="/terms">Terms</a>
+</footer>
+
+</body>
+</html>
