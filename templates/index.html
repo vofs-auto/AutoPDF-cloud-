@@ -129,16 +129,15 @@
   <input type="file" id="fileInput" accept="application/pdf" onchange="uploadPDF()" style="margin-bottom:10px;">
   <textarea id="textInput" placeholder="Type or paste your text here..."></textarea>
   <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
-<button onclick="showProcessing(); generatePDF()">Generate PDF</button>
+    <button onclick="showProcessing(); generatePDF()">Generate PDF</button>
   </div>
 
   <hr>
   <h2>Batch PDF Bot (Card Mode)</h2>
   <p style="color:#f0ff; font-weight:bold;">⚡ Fast and unlimited PDF generation</p>
-
   <div id="batchContainer"></div>
   <button class="add-row-btn" onclick="addRow()">+ Add Card</button>
-  <button onclick="generatePDF()">Generate PDF</button>
+  <button onclick="showProcessing(); generatePDF()">Generate PDF</button>
 </div>
 
 <footer>
@@ -179,11 +178,8 @@
 <script>
 function toggleTheme() { document.body.classList.toggle("light-mode"); }
 
-async function generatePDF() {
-  let text = document.getElementById("textInput").value;
-  <script>
 function showProcessing() {
-  const btn = document.querySelector("button[onclick='generatePDF()']");
+  const btn = document.querySelector("button[onclick*='generatePDF']");
   if (!btn) return;
   btn.disabled = true;
   const originalText = btn.textContent;
@@ -195,9 +191,9 @@ function showProcessing() {
     btn.style.opacity = "1";
   }, 3000);
 }
-</script>
 
-  // 🧩 Se houver blocos em modo card, junta tudo num único texto
+async function generatePDF() {
+  let text = document.getElementById("textInput").value;
   const cards = document.querySelectorAll(".batch-block");
   if (cards.length > 0) {
     text = "";
@@ -213,7 +209,6 @@ function showProcessing() {
 
   if (!text.trim()) return alert("Please type something first!");
 
-  // 🔄 Barra de progresso igual antes
   const overlay = document.createElement("div");
   overlay.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:10000;";
   const barContainer = document.createElement("div");
@@ -261,16 +256,17 @@ function showProcessing() {
   setTimeout(() => overlay.remove(), 2000);
 }
 
-// Upload PDF + Add Row + Stats etc.
 async function uploadPDF() {
   const file = document.getElementById("fileInput").files[0];
   if (!file) return;
-  const formData = new FormData(); formData.append("file", file);
+  const formData = new FormData();
+  formData.append("file", file);
   const res = await fetch("/upload_pdf", { method: "POST", body: formData });
   const data = await res.json();
   if (data.text) document.getElementById("textInput").value = data.text;
   document.getElementById("fileInput").value = "";
 }
+
 function addRow() {
   const c = document.getElementById("batchContainer");
   const d = document.createElement("div");
@@ -278,17 +274,23 @@ function addRow() {
   d.innerHTML = `<label>Name:</label><input type="text"/><label>Title:</label><input type="text"/><label>Date:</label><input type="text"/><label>Details:</label><textarea></textarea><button class="remove-row-btn" onclick="this.parentElement.remove()">Remove</button>`;
   c.appendChild(d);
 }
+
 async function refreshCounter() {
-  try { const r = await fetch("/counter"); const d = await r.json();
+  try {
+    const r = await fetch("/counter");
+    const d = await r.json();
     document.getElementById("pdfCount").textContent = "PDFs: " + d.count;
   } catch {}
 }
+
 setInterval(refreshCounter, 8000);
+
 function toggleAdmin() {
   const p = document.getElementById("adminPanel");
   p.style.display = p.style.display === "block" ? "none" : "block";
   if (p.style.display === "block") loadStats();
 }
+
 async function loadStats() {
   const r = await fetch("/admin_stats");
   const d = await r.json();
@@ -297,13 +299,15 @@ async function loadStats() {
     <p><strong>Today:</strong> ${d.today}</p>
     <p><strong>Users:</strong> ${d.users}</p>`;
 }
+
 async function openPage(url) {
   const r = await fetch(url);
   const h = await r.text();
   document.getElementById("pageInner").innerHTML = h;
   document.getElementById("pageModal").style.display = "flex";
 }
+
 function closePage() { document.getElementById("pageModal").style.display = "none"; }
 </script>
 </body>
-</html>
+    </html>
