@@ -12,16 +12,15 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.enums import TA_LEFT, TA_CENTER
+from reportlab.lib.enums import TA_LEFT
+from reportlab.pdfgen import canvas
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
-# Caminhos
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FONTS_DIR = os.path.join(APP_DIR, "fonts")
 COUNTER_FILE = os.path.join(APP_DIR, "pdf_counter.json")
 
-# --- Fonte com suporte a acentos e caracteres especiais ---
 def register_font():
     font_name = "DejaVuSans"
     possible = [
@@ -39,7 +38,6 @@ def register_font():
 
 MAIN_FONT = register_font()
 
-# --- Limpeza de texto (remove emojis / quadrados pretos) ---
 def sanitize_text(text):
     if not isinstance(text, str):
         return ""
@@ -47,7 +45,6 @@ def sanitize_text(text):
     text = re.sub(r"[\U00010000-\U0010FFFF]", "", text)
     return text.replace("\r\n", "\n").replace("\r", "\n")
 
-# --- Contador ---
 def load_counter():
     if not os.path.exists(COUNTER_FILE):
         data = {"total": 0, "today_date": date.today().isoformat(), "today": 0, "users": []}
@@ -71,43 +68,55 @@ def increment_counter(ip):
         data["users"].append(ip)
     save_counter(data)
 
-# --- Gerador de PDF profissional ---
+# --- Função para adicionar rodapé discreto ---
+def add_footer(canvas_obj, doc):
+    canvas_obj.saveState()
+    canvas_obj.setFont(MAIN_FONT, 8)
+    canvas_obj.setFillGray(0.5, 0.3)  # Cinza translúcido
+    footer_text = "AutoPDF Cloud — Professional PDF Export"
+    canvas_obj.drawRightString(A4[0] - 20*mm, 10*mm, footer_text)
+    canvas_obj.restoreState()
+
+# --- Gerador de PDF com layout refinado ---
 def build_pdf(text):
     buffer = io.BytesIO()
     text = sanitize_text(text)
 
-    doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=25*mm, rightMargin=25*mm, topMargin=25*mm, bottomMargin=20*mm)
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=25*mm,
+        rightMargin=25*mm,
+        topMargin=25*mm,
+        bottomMargin=20*mm,
+    )
+
     styles = getSampleStyleSheet()
     normal = ParagraphStyle("Normal", fontName=MAIN_FONT, fontSize=12, leading=15)
-    label = ParagraphStyle("Label", fontName=MAIN_FONT, fontSize=14, leading=18, spaceAfter=8, alignment=TA_LEFT)
-    title = ParagraphStyle("Title", fontName=MAIN_FONT, fontSize=18, leading=22, alignment=TA_CENTER)
+    label = ParagraphStyle("Label", fontName=MAIN_FONT, fontSize=13, leading=17, spaceAfter=6, alignment=TA_LEFT)
+    title_card = ParagraphStyle("TitleCard", fontName=MAIN_FONT, fontSize=15, leading=20, spaceBefore=15, spaceAfter=10, alignment=TA_LEFT)
 
     story = [
-        Paragraph("AutoPDF Cloud", title),
-        Spacer(1, 12),
         Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal),
-        Spacer(1, 10)
+        Spacer(1, 15)
     ]
 
-    # Detecta e formata cards
     cards = re.findall(r"Name:\s*(.*?)\nTitle:\s*(.*?)\nDate:\s*(.*?)\nDetails:\s*([\s\S]*?)(?=\nName:|\Z)", text)
     if cards:
         for i, (name, title_, date_, details) in enumerate(cards, start=1):
-            story.append(Paragraph(f"Card {i}", title))
+            story.append(Paragraph(f"Card {i}", title_card))
             story.append(Paragraph(f"<b>Name:</b> {name}", label))
             story.append(Paragraph(f"<b>Title:</b> {title_}", label))
             story.append(Paragraph(f"<b>Date:</b> {date_}", label))
             story.append(Paragraph("<b>Details:</b>", label))
             story.append(Paragraph(details.replace("\n", "<br/>"), normal))
-            story.append(Spacer(1, 15))
+            story.append(Spacer(1, 20))
     else:
         for para in text.split("\n\n"):
             story.append(Paragraph(para.strip().replace("\n", "<br/>"), normal))
             story.append(Spacer(1, 10))
 
-    story.append(Spacer(1, 15))
-    story.append(Paragraph("AutoPDF Cloud — Professional PDF Export", ParagraphStyle("Footer", fontName=MAIN_FONT, fontSize=10, alignment=TA_CENTER)))
-    doc.build(story)
+    doc.build(story, onFirstPage=add_footer, onLaterPages=add_footer)
     buffer.seek(0)
     return buffer
 
@@ -144,7 +153,7 @@ def admin_stats():
     data = load_counter()
     return jsonify({"total": data["total"], "today": data["today"], "users": len(data["users"])})
 
-# --- Páginas HTML reais ---
+# --- Páginas HTML existentes ---
 @app.route("/about")
 @app.route("/privacy")
 @app.route("/terms")
