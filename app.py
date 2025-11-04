@@ -3,7 +3,7 @@ import os
 import io
 import json
 import re
-from datetime import datetime, date
+from datetime import date
 from flask import Flask, request, send_file, jsonify, render_template, abort
 import PyPDF2
 from reportlab.lib.pagesizes import A4
@@ -14,6 +14,9 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.enums import TA_LEFT
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from PIL import Image
+import pytesseract
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
@@ -21,6 +24,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FONTS_DIR = os.path.join(APP_DIR, "fonts")
 COUNTER_FILE = os.path.join(APP_DIR, "pdf_counter.json")
 
+# --- Registrar fonte ---
 def register_font():
     font_name = "DejaVuSans"
     possible = [
@@ -38,6 +42,7 @@ def register_font():
 
 MAIN_FONT = register_font()
 
+# --- Funções utilitárias ---
 def sanitize_text(text):
     if not isinstance(text, str):
         return ""
@@ -68,17 +73,17 @@ def increment_counter(ip):
         data["users"].append(ip)
     save_counter(data)
 
-# --- Função para adicionar rodapé discreto ---
+# --- Rodapé discreto ---
 def add_footer(canvas_obj, doc):
     canvas_obj.saveState()
     canvas_obj.setFont(MAIN_FONT, 8)
-    canvas_obj.setFillGray(0.5, 0.3)  # Cinza translúcido
+    canvas_obj.setFillGray(0.5, 0.3)
     footer_text = "AutoPDF Cloud — Professional PDF Export"
     canvas_obj.drawRightString(A4[0] - 20*mm, 10*mm, footer_text)
     canvas_obj.restoreState()
 
-# --- Gerador de PDF com layout refinado ---
-def build_pdf(text):
+# --- Gerador de PDF com imagem opcional ---
+def build_pdf(text, logo_file=None, logo_position="left"):
     buffer = io.BytesIO()
     text = sanitize_text(text)
 
@@ -96,11 +101,22 @@ def build_pdf(text):
     label = ParagraphStyle("Label", fontName=MAIN_FONT, fontSize=13, leading=17, spaceAfter=6, alignment=TA_LEFT)
     title_card = ParagraphStyle("TitleCard", fontName=MAIN_FONT, fontSize=15, leading=20, spaceBefore=15, spaceAfter=10, alignment=TA_LEFT)
 
-    story = [
-        Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal),
-        Spacer(1, 15)
-    ]
+    story = []
 
+    # --- Inserir logo se fornecido ---
+    if logo_file:
+        img_reader = ImageReader(logo_file)
+        # Posição fixa
+        x = {"left": 25*mm, "center": (A4[0]-50)/2, "right": A4[0]-25*mm-50}.get(logo_position, 25*mm)
+        y = A4[1] - 60  # distância do topo
+        def draw_logo(canvas_obj, doc_obj):
+            canvas_obj.drawImage(img_reader, x, y, width=50, height=50, preserveAspectRatio=True)
+            add_footer(canvas_obj, doc_obj)
+        on_first = draw_logo
+    else:
+        on_first = add_footer
+
+    # --- Adicionar conteúdo do texto ---
     cards = re.findall(r"Name:\s*(.*?)\nTitle:\s*(.*?)\nDate:\s*(.*?)\nDetails:\s*([\s\S]*?)(?=\nName:|\Z)", text)
     if cards:
         for i, (name, title_, date_, details) in enumerate(cards, start=1):
@@ -116,7 +132,7 @@ def build_pdf(text):
             story.append(Paragraph(para.strip().replace("\n", "<br/>"), normal))
             story.append(Spacer(1, 10))
 
-    doc.build(story, onFirstPage=add_footer, onLaterPages=add_footer)
+    doc.build(story, onFirstPage=on_first, onLaterPages=add_footer)
     buffer.seek(0)
     return buffer
 
@@ -131,7 +147,9 @@ def generate_pdf():
     text = sanitize_text(request.form.get("text", ""))
     if not text.strip():
         return jsonify({"error": "Empty text"}), 400
-    pdf_buffer = build_pdf(text)
+    logo_file = request.files.get("logo")
+    logo_position = request.form.get("logo_position", "left")
+    pdf_buffer = build_pdf(text, logo_file, logo_position)
     increment_counter(request.remote_addr or "anon")
     return send_file(pdf_buffer, as_attachment=True, download_name="document.pdf", mimetype="application/pdf")
 
@@ -140,8 +158,19 @@ def upload_pdf():
     if "file" not in request.files:
         return jsonify({"error": "No file"}), 400
     file = request.files["file"]
-    reader = PyPDF2.PdfReader(file)
-    text = "\n\n".join([page.extract_text() or "" for page in reader.pages])
+    filename = file.filename.lower()
+    text = ""
+    try:
+        if filename.endswith(".pdf"):
+            reader = PyPDF2.PdfReader(file)
+            text = "\n\n".join([page.extract_text() or "" for page in reader.pages])
+        elif filename.endswith((".png", ".jpg", ".jpeg")):
+            img = Image.open(file)
+            text = pytesseract.image_to_string(img)
+        else:
+            return jsonify({"error": "Formato não suportado"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     return jsonify({"text": sanitize_text(text)})
 
 @app.route("/counter")
@@ -153,7 +182,7 @@ def admin_stats():
     data = load_counter()
     return jsonify({"total": data["total"], "today": data["today"], "users": len(data["users"])})
 
-# --- Páginas HTML existentes ---
+# --- Páginas estáticas ---
 @app.route("/about")
 @app.route("/privacy")
 @app.route("/terms")
