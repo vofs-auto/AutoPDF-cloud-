@@ -2,5 +2,5 @@ Flask==2.3.3
 reportlab==4.0.4
 PyPDF2==3.0.1
 gunicorn
-pytesseract==0.3.12
+pytesseract
 Pillow==10.0.1
