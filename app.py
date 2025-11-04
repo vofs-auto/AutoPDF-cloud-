@@ -4,11 +4,6 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from io import BytesIO
 from PIL import Image
-import pytesseract
-pytesseract.pytesseract.tesseract_cmd = "/data/data/com.termux/files/usr/bin/tesseract"
-# teste com qualquer imagem .png/.jpg que você tenha
-text = pytesseract.image_to_string("teste.png")
-print(text)
 import os
 from datetime import datetime
 
@@ -17,42 +12,45 @@ app = Flask(__name__)
 # Contador simples de PDFs gerados
 pdf_counter = {"total": 0, "today": 0, "users": 0}
 
-
 @app.route("/")
 def index():
     return render_template("index.html", count=pdf_counter["total"])
-
 
 @app.route("/counter")
 def counter():
     return jsonify({"count": pdf_counter["total"]})
 
-
-@app.route("/upload_pdf", methods=["POST"])
-def upload_pdf():
+@app.route("/upload_file", methods=["POST"])
+def upload_file():
     if "file" not in request.files:
         return jsonify({"text": ""})
-    
+
     file = request.files["file"]
-    text = ""
     filename = file.filename.lower()
+    text = ""
 
     try:
         if filename.endswith(".pdf"):
+            # Extrai texto de PDFs
             reader = PdfReader(file)
             for page in reader.pages:
                 page_text = page.extract_text()
                 if page_text:
                     text += page_text + "\n"
+            return jsonify({"text": text})
         else:
-            # Para imagens: OCR
+            # Para imagens: apenas gera PDF com a imagem
             img = Image.open(file)
-            text = pytesseract.image_to_string(img)
+            buffer = BytesIO()
+            img.save(buffer, format="PDF")
+            buffer.seek(0)
+
+            pdf_counter["total"] += 1
+            pdf_counter["today"] += 1
+
+            return send_file(buffer, as_attachment=True, download_name="document.pdf", mimetype="application/pdf")
     except Exception as e:
-        return jsonify({"text": f"Error reading file: {str(e)}"})
-
-    return jsonify({"text": text})
-
+        return jsonify({"text": f"Erro ao processar arquivo: {str(e)}"})
 
 @app.route("/generate_pdf", methods=["POST"])
 def generate_pdf():
@@ -69,7 +67,6 @@ def generate_pdf():
         try:
             img = Image.open(logo_file)
             img_width, img_height = img.size
-            # Reduz tamanho se necessário
             max_width = width / 3
             scale = min(max_width / img_width, 1)
             img_width *= scale
@@ -100,11 +97,9 @@ def generate_pdf():
 
     return send_file(buffer, as_attachment=True, download_name="document.pdf", mimetype="application/pdf")
 
-
 @app.route("/admin_stats")
 def admin_stats():
     return jsonify(pdf_counter)
-
 
 # Rotas de páginas adicionais
 @app.route("/about")
