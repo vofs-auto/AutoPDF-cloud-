@@ -6,6 +6,9 @@ from io import BytesIO
 from PIL import Image
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = "/data/data/com.termux/files/usr/bin/tesseract"
+# teste com qualquer imagem .png/.jpg que você tenha
+text = pytesseract.image_to_string("teste.png")
+print(text)
 import os
 from datetime import datetime
 
