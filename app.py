@@ -5,6 +5,7 @@ from reportlab.lib.pagesizes import A4
 from io import BytesIO
 from PIL import Image
 import pytesseract
+pytesseract.pytesseract.tesseract_cmd = "/data/data/com.termux/files/usr/bin/tesseract"
 import os
 from datetime import datetime
 
