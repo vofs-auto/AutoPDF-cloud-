@@ -43,13 +43,14 @@
       background-color: var(--card); border-radius: 14px;
       box-shadow: 0 0 14px rgba(0,0,0,0.4); padding-bottom: 92px;
     }
-    textarea, input {
+    textarea, input, select {
       width: 100%; background-color: #0d1107; color: var(--text);
       border: 1px solid #30363d; border-radius: 8px;
       padding: 10px; font-size: 14px; resize: vertical;
+      margin-bottom: 10px;
     }
     textarea { min-height: 180px; }
-    body.light-mode textarea, body.light-mode input {
+    body.light-mode textarea, body.light-mode input, body.light-mode select {
       background-color: #f0f0f0; color: #111; border: 1px solid #ccc;
     }
     button {
@@ -126,8 +127,24 @@
 
 <div class="container">
   <h2>Generate a Single PDF</h2>
-  <input type="file" id="fileInput" accept="application/pdf" onchange="uploadPDF()" style="margin-bottom:10px;">
+  
+  <!-- Upload PDF ou imagem -->
+  <input type="file" id="fileInput" accept="application/pdf,image/*" onchange="uploadPDF()">
+
+  <!-- Upload logo -->
+  <label>Add Logo / Image (optional):</label>
+  <input type="file" id="logoInput" accept="image/*">
+
+  <!-- Posição do logo -->
+  <label>Logo Position:</label>
+  <select id="logoPosition">
+    <option value="left">Left</option>
+    <option value="center">Center</option>
+    <option value="right">Right</option>
+  </select>
+
   <textarea id="textInput" placeholder="Type or paste your text here..."></textarea>
+  
   <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
     <button onclick="showProcessing(); generatePDF()">Generate PDF</button>
   </div>
@@ -174,9 +191,10 @@
     <div id="pageInner">Loading...</div>
   </div>
 </div>
-
 <script>
-function toggleTheme() { document.body.classList.toggle("light-mode"); }
+function toggleTheme() {
+  document.body.classList.toggle("light-mode");
+}
 
 function showProcessing() {
   const btn = document.querySelector("button[onclick*='generatePDF']");
@@ -195,6 +213,7 @@ function showProcessing() {
 async function generatePDF() {
   let text = document.getElementById("textInput").value;
   const cards = document.querySelectorAll(".batch-block");
+
   if (cards.length > 0) {
     text = "";
     cards.forEach((card, i) => {
@@ -227,12 +246,23 @@ async function generatePDF() {
 
   let progress = 0;
   const interval = setInterval(() => {
-    if (progress < 90) { progress += Math.random() * 15; bar.style.width = Math.min(progress, 90) + "%"; }
+    if (progress < 90) {
+      progress += Math.random() * 15;
+      bar.style.width = Math.min(progress, 90) + "%";
+    }
   }, 400);
 
   try {
     const fd = new FormData();
     fd.append("text", text);
+
+    // Logo
+    const logoFile = document.getElementById("logoInput").files[0];
+    if (logoFile) fd.append("logo", logoFile);
+
+    const position = document.getElementById("logoPosition").value;
+    fd.append("logo_position", position);
+
     const res = await fetch("/generate_pdf", { method: "POST", body: fd });
 
     clearInterval(interval);
@@ -247,11 +277,13 @@ async function generatePDF() {
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "batch_document.pdf";
+      a.download = "document.pdf";
       a.click();
       refreshCounter();
     } else alert("Error generating PDF!");
-  } catch (e) { alert("Error: " + e.message); }
+  } catch (e) {
+    alert("Error: " + e.message);
+  }
 
   setTimeout(() => overlay.remove(), 2000);
 }
@@ -271,7 +303,13 @@ function addRow() {
   const c = document.getElementById("batchContainer");
   const d = document.createElement("div");
   d.className = "batch-block";
-  d.innerHTML = `<label>Name:</label><input type="text"/><label>Title:</label><input type="text"/><label>Date:</label><input type="text"/><label>Details:</label><textarea></textarea><button class="remove-row-btn" onclick="this.parentElement.remove()">Remove</button>`;
+  d.innerHTML = `
+    <label>Name:</label><input type="text"/>
+    <label>Title:</label><input type="text"/>
+    <label>Date:</label><input type="text"/>
+    <label>Details:</label><textarea></textarea>
+    <button class="remove-row-btn" onclick="this.parentElement.remove()">Remove</button>
+  `;
   c.appendChild(d);
 }
 
@@ -292,22 +330,28 @@ function toggleAdmin() {
 }
 
 async function loadStats() {
-  const r = await fetch("/admin_stats");
-  const d = await r.json();
-  document.getElementById("adminStats").innerHTML = `
-    <p><strong>Total PDFs:</strong> ${d.total}</p>
-    <p><strong>Today:</strong> ${d.today}</p>
-    <p><strong>Users:</strong> ${d.users}</p>`;
+  try {
+    const r = await fetch("/admin_stats");
+    const d = await r.json();
+    document.getElementById("adminStats").innerHTML =
+      `<p><strong>Total PDFs:</strong> ${d.total}</p>
+       <p><strong>Today:</strong> ${d.today}</p>
+       <p><strong>Users:</strong> ${d.users}</p>`;
+  } catch {}
 }
 
 async function openPage(url) {
-  const r = await fetch(url);
-  const h = await r.text();
-  document.getElementById("pageInner").innerHTML = h;
-  document.getElementById("pageModal").style.display = "flex";
+  try {
+    const r = await fetch(url);
+    const h = await r.text();
+    document.getElementById("pageInner").innerHTML = h;
+    document.getElementById("pageModal").style.display = "flex";
+  } catch(e) { alert("Error loading page!"); }
 }
 
-function closePage() { document.getElementById("pageModal").style.display = "none"; }
+function closePage() {
+  document.getElementById("pageModal").style.display = "none";
+}
 </script>
 </body>
-    </html>
+</html>
