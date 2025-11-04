@@ -1,357 +1,295 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>AutoPDF Cloud</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --bg: #0d1117;
-      --card: #161b22;
-      --text: #e6edf3;
-      --accent: #00e6ff;
-      --muted: #8b949e;
-    }
-    body.light-mode {
-      --bg: #f8f9fa;
-      --card: #ffffff;
-      --text: #111;
-      --accent: #0077ff;
-      --muted: #555;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: "Inter", system-ui, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 20px;
-      background-color: var(--card);
-      border-bottom: 1px solid #1f2937;
-    }
-    header h1 { margin: 0; font-size: 20px; color: var(--accent); }
-    .top-right { display: flex; align-items: center; gap: 12px; font-size: 13px; }
-    .container {
-      flex: 1; max-width: 950px; margin: 25px auto; padding: 20px;
-      background-color: var(--card); border-radius: 14px;
-      box-shadow: 0 0 14px rgba(0,0,0,0.4); padding-bottom: 92px;
-    }
-    textarea, input, select {
-      width: 100%; background-color: #0d1107; color: var(--text);
-      border: 1px solid #30363d; border-radius: 8px;
-      padding: 10px; font-size: 14px; resize: vertical;
-      margin-bottom: 10px;
-    }
-    textarea { min-height: 180px; }
-    body.light-mode textarea, body.light-mode input, body.light-mode select {
-      background-color: #f0f0f0; color: #111; border: 1px solid #ccc;
-    }
-    button {
-      background-color: var(--accent); color: #000; border: none;
-      padding: 10px 18px; border-radius: 8px; font-weight: 600;
-      cursor: pointer; transition: 0.2s;
-    }
-    button:hover { opacity: 0.85; }
-    hr { border-color: #1f2937; margin: 30px 0; }
-    .batch-block {
-      border: 1px solid #30363d; border-radius: 10px; padding: 10px;
-      margin-top: 10px; background-color: #0d1117;
-    }
-    .remove-row-btn {
-      background-color: #ff4d4d; color: #fff; border: none;
-      padding: 6px 10px; border-radius: 6px; cursor: pointer; margin-top: 8px;
-    }
-    .add-row-btn { background-color: #00ffcc; color: #000; margin-top: 10px; }
-    #ad-banner {
-      background: #1a0033; color: #00eaff; text-align: center;
-      padding: 8px 10px; font-size: 11px; min-height: 48px;
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 9999;
-    }
-    footer {
-      text-align: center; padding: 15px; font-size: 12px; color: var(--muted);
-      border-top: 1px solid #1f2937; margin-top: 30px;
-    }
-    footer a { color: #00f; margin: 0 8px; text-decoration: none; }
-    footer a:hover { color: var(--accent); }
-    #adminPanel {
-      display: none; position: fixed; top: 10%; left: 50%;
-      transform: translateX(-50%); background: var(--card);
-      padding: 20px; border-radius: 10px; width: 90%; max-width: 480px;
-      box-shadow: 0 0 10px rgba(0,255,255,0.2);
-    }
-    #adminPanel h3 { color: var(--accent); margin-bottom: 10px; text-align: center; }
-    #closeAdmin {
-      background: #ff3b3b; color: white; padding: 6px 10px; border: none;
-      border-radius: 6px; cursor: pointer; float: right;
-    }
-    #pageModal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); justify-content: center; align-items: center;
-      z-index: 10000;
-    }
-    #pageContent {
-      background: var(--card); color: var(--text); padding: 20px;
-      border-radius: 12px; max-width: 750px; max-height: 85%; overflow-y: auto;
-    }
-    #closePage {
-      background: #ff3b3b; border: none; color: white;
-      padding: 5px 10px; border-radius: 6px; float: right; cursor: pointer;
-    }
-    footer { margin-bottom: 80px; }
-    .info-text {
-      max-width: 900px; margin: 5px auto; text-align: center; font-size: 1em;
-      background: #1a0066; padding: 10px 15px; border-radius: 50px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #f0f;
-    }
-  </style>
-</head>
-<body>
-<header>
-  <h1>AutoPDF Cloud</h1>
-  <div class="top-right">
-    <span style="color:var(--muted)">User: Guest</span>
-    <span id="pdfCount" style="color:#00e6ff;font-weight:600;">PDFs: {{count}}</span>
-    <span title="Settings" style="cursor:pointer;" onclick="toggleAdmin()">⚙️</span>
-  </div>
-</header>
-
-<p class="info-text">Generate PDFs fast ⚡ and free — all downloads are stored directly on your device 🤓.</p>
-<div id="ad-banner"></div>
-
-<div class="container">
-  <h2>Generate a Single PDF</h2>
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <title>AutoPDF Cloud</title>  
+  <meta name="viewport" content="width=device-width, initial-scale=1">  
+  <style>  
+    :root {  
+      --bg: #0d1117;  
+      --card: #161b22;  
+      --text: #e6edf3;  
+      --accent: #00e6ff;  
+      --muted: #8b949e;  
+    }  
+    body.light-mode {  
+      --bg: #f8f9fa;  
+      --card: #ffffff;  
+      --text: #111;  
+      --accent: #0077ff;  
+      --muted: #555;  
+    }  
+    * { box-sizing: border-box; margin: 0; padding: 0; }  
+    body {  
+      font-family: "Inter", system-ui, sans-serif;  
+      background-color: var(--bg);  
+      color: var(--text);  
+      display: flex;  
+      flex-direction: column;  
+      min-height: 100vh;  
+    }  
+    header {  
+      display: flex;  
+      justify-content: space-between;  
+      align-items: center;  
+      padding: 14px 20px;  
+      background-color: var(--card);  
+      border-bottom: 1px solid #1f2937;  
+    }  
+    header h1 { margin: 0; font-size: 20px; color: var(--accent); }  
+    .top-right { display: flex; align-items: center; gap: 12px; font-size: 13px; }  
+    .container {  
+      flex: 1; max-width: 950px; margin: 25px auto; padding: 20px;  
+      background-color: var(--card); border-radius: 14px;  
+      box-shadow: 0 0 14px rgba(0,0,0,0.4); padding-bottom: 92px;  
+    }  
+    textarea, input {  
+      width: 100%; background-color: #0d1107; color: var(--text);  
+      border: 1px solid #30363d; border-radius: 8px;  
+      padding: 10px; font-size: 14px; resize: vertical;  
+    }  
+    textarea { min-height: 180px; }  
+    body.light-mode textarea, body.light-mode input {  
+      background-color: #f0f0f0; color: #111; border: 1px solid #ccc;  
+    }  
+    button {  
+      background-color: var(--accent); color: #000; border: none;  
+      padding: 10px 18px; border-radius: 8px; font-weight: 600;  
+      cursor: pointer; transition: 0.2s;  
+    }  
+    button:hover { opacity: 0.85; }  
+    hr { border-color: #1f2937; margin: 30px 0; }  
+    .batch-block {  
+      border: 1px solid #30363d; border-radius: 10px; padding: 10px;  
+      margin-top: 10px; background-color: #0d1117;  
+    }  
+    .remove-row-btn {  
+      background-color: #ff4d4d; color: #fff; border: none;  
+      padding: 6px 10px; border-radius: 6px; cursor: pointer; margin-top: 8px;  
+    }  
+    .add-row-btn { background-color: #00ffcc; color: #000; margin-top: 10px; }  
+    #ad-banner {  
+      background: #1a0033; color: #00eaff; text-align: center;  
+      padding: 8px 10px; font-size: 11px; min-height: 48px;  
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 9999;  
+    }  
+    footer {  
+      text-align: center; padding: 15px; font-size: 12px; color: var(--muted);  
+      border-top: 1px solid #1f2937; margin-top: 30px;  
+    }  
+    footer a { color: #00f; margin: 0 8px; text-decoration: none; }  
+    footer a:hover { color: var(--accent); }  
+    #adminPanel {  
+      display: none; position: fixed; top: 10%; left: 50%;  
+      transform: translateX(-50%); background: var(--card);  
+      padding: 20px; border-radius: 10px; width: 90%; max-width: 480px;  
+      box-shadow: 0 0 10px rgba(0,255,255,0.2);  
+    }  
+    #adminPanel h3 { color: var(--accent); margin-bottom: 10px; text-align: center; }  
+    #closeAdmin {  
+      background: #ff3b3b; color: white; padding: 6px 10px; border: none;  
+      border-radius: 6px; cursor: pointer; float: right;  
+    }  
+    #pageModal {  
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;  
+      background: rgba(0,0,0,0.7); justify-content: center; align-items: center;  
+      z-index: 10000;  
+    }  
+    #pageContent {  
+      background: var(--card); color: var(--text); padding: 20px;  
+      border-radius: 12px; max-width: 750px; max-height: 85%; overflow-y: auto;  
+    }  
+    #closePage {  
+      background: #ff3b3b; border: none; color: white;  
+      padding: 5px 10px; border-radius: 6px; float: right; cursor: pointer;  
+    }  
+    footer { margin-bottom: 80px; }  
+    .info-text {  
+      max-width: 900px; margin: 5px auto; text-align: center; font-size: 1em;  
+      background: #1a0066; padding: 10px 15px; border-radius: 50px;  
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #f0f;  
+    }  
+  </style>  
+</head>  
+<body>  
+<header>  
+  <h1>AutoPDF Cloud</h1>  
+  <div class="top-right">  
+    <span style="color:var(--muted)">User: Guest</span>  
+    <span id="pdfCount" style="color:#00e6ff;font-weight:600;">PDFs: {{count}}</span>  
+    <span title="Settings" style="cursor:pointer;" onclick="toggleAdmin()">⚙️</span>  
+  </div>  
+</header>  <p class="info-text">Generate PDFs fast ⚡ and free — all downloads are stored directly on your device 🤓.</p>  
+<div id="ad-banner"></div>  <div class="container">  
+  <h2>Generate a Single PDF</h2>  
+  <input type="file" id="fileInput" accept="application/pdf" onchange="uploadPDF()" style="margin-bottom:10px;">  
+  <textarea id="textInput" placeholder="Type or paste your text here..."></textarea>  
+  <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">  
+    <button onclick="showProcessing(); generatePDF()">Generate PDF</button>  
+  </div>    <hr>  
+  <h2>Batch PDF Bot (Card Mode)</h2>  
+  <p style="color:#f0ff; font-weight:bold;">⚡ Fast and unlimited PDF generation</p>  
+  <div id="batchContainer"></div>  
+  <button class="add-row-btn" onclick="addRow()">+ Add Card</button>  
+  <button onclick="showProcessing(); generatePDF()">Generate PDF</button>  
+</div>  <footer>  
+  <div style="margin-bottom:6px;">© 2025 AutoPDF Cloud</div>  
+  <div>  
+    <a href="/about">About</a> |  
+    <a href="/privacy">Privacy Policy</a> |  
+    <a href="/terms">Terms of Service</a> |  
+    <a href="/cookies">Cookies Policy</a> |  
+    <a href="/contact">Contact</a> |  
+    <a href="/faq">FAQ</a> |  
+    <a href="/disclaimer">Disclaimer</a>  
+  </div>  
+</footer>  <div id="adminPanel">  
+  <button id="closeAdmin" onclick="toggleAdmin()">X</button>  
+  <h3>Settings</h3>  
+  <div style="display:flex;flex-direction:column;gap:8px;">  
+    <button onclick="toggleTheme()">🌙 / ☀️ Theme</button>  
+    <button onclick="openPage('/about')">📄 About</button>  
+    <button onclick="openPage('/privacy')">🔒 Privacy Policy</button>  
+    <button onclick="openPage('/terms')">📜 Terms of Service</button>  
+    <button onclick="openPage('/contact')">✉️ Contact</button>  
+    <button onclick="openPage('/faq')">❓ FAQ</button>  
+    <button onclick="openPage('/disclaimer')">⚠️ Disclaimer</button>  
+  </div>  
+  <div id="adminStats" style="margin-top:12px;color:var(--muted);font-size:13px;">Loading stats...</div>  
+</div>  <div id="pageModal">  
+  <div id="pageContent">  
+    <button id="closePage" onclick="closePage()">X</button>  
+    <div id="pageInner">Loading...</div>  
+  </div>  
+</div>  <script>  
+function toggleTheme() { document.body.classList.toggle("light-mode"); }  
   
-  <!-- Upload PDF ou imagem -->
-  <input type="file" id="fileInput" accept="application/pdf,image/*" onchange="uploadPDF()">
-
-  <!-- Upload logo -->
-  <label>Add Logo / Image (optional):</label>
-  <input type="file" id="logoInput" accept="image/*">
-
-  <!-- Posição do logo -->
-  <label>Logo Position:</label>
-  <select id="logoPosition">
-    <option value="left">Left</option>
-    <option value="center">Center</option>
-    <option value="right">Right</option>
-  </select>
-
-  <textarea id="textInput" placeholder="Type or paste your text here..."></textarea>
+function showProcessing() {  
+  const btn = document.querySelector("button[onclick*='generatePDF']");  
+  if (!btn) return;  
+  btn.disabled = true;  
+  const originalText = btn.textContent;  
+  btn.textContent = "Generating...";  
+  btn.style.opacity = "0.7";  
+  setTimeout(() => {  
+    btn.textContent = originalText;  
+    btn.disabled = false;  
+    btn.style.opacity = "1";  
+  }, 3000);  
+}  
   
-  <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
-    <button onclick="showProcessing(); generatePDF()">Generate PDF</button>
-  </div>
-
-  <hr>
-  <h2>Batch PDF Bot (Card Mode)</h2>
-  <p style="color:#f0ff; font-weight:bold;">⚡ Fast and unlimited PDF generation</p>
-  <div id="batchContainer"></div>
-  <button class="add-row-btn" onclick="addRow()">+ Add Card</button>
-  <button onclick="showProcessing(); generatePDF()">Generate PDF</button>
-</div>
-
-<footer>
-  <div style="margin-bottom:6px;">© 2025 AutoPDF Cloud</div>
-  <div>
-    <a href="/about">About</a> |
-    <a href="/privacy">Privacy Policy</a> |
-    <a href="/terms">Terms of Service</a> |
-    <a href="/cookies">Cookies Policy</a> |
-    <a href="/contact">Contact</a> |
-    <a href="/faq">FAQ</a> |
-    <a href="/disclaimer">Disclaimer</a>
-  </div>
-</footer>
-
-<div id="adminPanel">
-  <button id="closeAdmin" onclick="toggleAdmin()">X</button>
-  <h3>Settings</h3>
-  <div style="display:flex;flex-direction:column;gap:8px;">
-    <button onclick="toggleTheme()">🌙 / ☀️ Theme</button>
-    <button onclick="openPage('/about')">📄 About</button>
-    <button onclick="openPage('/privacy')">🔒 Privacy Policy</button>
-    <button onclick="openPage('/terms')">📜 Terms of Service</button>
-    <button onclick="openPage('/contact')">✉️ Contact</button>
-    <button onclick="openPage('/faq')">❓ FAQ</button>
-    <button onclick="openPage('/disclaimer')">⚠️ Disclaimer</button>
-  </div>
-  <div id="adminStats" style="margin-top:12px;color:var(--muted);font-size:13px;">Loading stats...</div>
-</div>
-
-<div id="pageModal">
-  <div id="pageContent">
-    <button id="closePage" onclick="closePage()">X</button>
-    <div id="pageInner">Loading...</div>
-  </div>
-</div>
-<script>
-function toggleTheme() {
-  document.body.classList.toggle("light-mode");
-}
-
-function showProcessing() {
-  const btn = document.querySelector("button[onclick*='generatePDF']");
-  if (!btn) return;
-  btn.disabled = true;
-  const originalText = btn.textContent;
-  btn.textContent = "Generating...";
-  btn.style.opacity = "0.7";
-  setTimeout(() => {
-    btn.textContent = originalText;
-    btn.disabled = false;
-    btn.style.opacity = "1";
-  }, 3000);
-}
-
-async function generatePDF() {
-  let text = document.getElementById("textInput").value;
-  const cards = document.querySelectorAll(".batch-block");
-
-  if (cards.length > 0) {
-    text = "";
-    cards.forEach((card, i) => {
-      const inputs = card.querySelectorAll("input, textarea");
-      const name = inputs[0].value || "No name";
-      const title = inputs[1].value || "Untitled";
-      const date = inputs[2].value || "No date";
-      const details = inputs[3].value || "No details";
-      text += `\n\n🗂️ Card ${i + 1}\nName: ${name}\nTitle: ${title}\nDate: ${date}\nDetails:\n${details}\n`;
-    });
-  }
-
-  if (!text.trim()) return alert("Please type something first!");
-
-  const overlay = document.createElement("div");
-  overlay.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:10000;";
-  const barContainer = document.createElement("div");
-  barContainer.style = "width:300px;height:12px;border:2px solid #00ccff;border-radius:10px;overflow:hidden;background:#111;";
-  const bar = document.createElement("div");
-  bar.style = "width:0%;height:100%;background:linear-gradient(90deg,#00ccff,#7b2ff7);transition:width 1s ease;";
-  const msg = document.createElement("p");
-  msg.textContent = "⚙️ Generating PDF...";
-  msg.style = "color:#00e6ff;margin-top:15px;font-family:Inter,sans-serif;font-size:14px;text-align:center;";
-  barContainer.appendChild(bar);
-  const box = document.createElement("div");
-  box.style = "text-align:center;";
-  box.append(barContainer, msg);
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-
-  let progress = 0;
-  const interval = setInterval(() => {
-    if (progress < 90) {
-      progress += Math.random() * 15;
-      bar.style.width = Math.min(progress, 90) + "%";
-    }
-  }, 400);
-
-  try {
-    const fd = new FormData();
-    fd.append("text", text);
-
-    // Logo
-    const logoFile = document.getElementById("logoInput").files[0];
-    if (logoFile) fd.append("logo", logoFile);
-
-    const position = document.getElementById("logoPosition").value;
-    fd.append("logo_position", position);
-
-    const res = await fetch("/generate_pdf", { method: "POST", body: fd });
-
-    clearInterval(interval);
-    bar.style.width = "100%";
-    msg.textContent = "✅ PDF ready!";
-
-    const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_49c181d6a4.mp3?filename=success-1-6297.mp3");
-    audio.volume = 0.4;
-    audio.play().catch(()=>{});
-
-    if (res.ok) {
-      const blob = await res.blob();
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "document.pdf";
-      a.click();
-      refreshCounter();
-    } else alert("Error generating PDF!");
-  } catch (e) {
-    alert("Error: " + e.message);
-  }
-
-  setTimeout(() => overlay.remove(), 2000);
-}
-
-async function uploadPDF() {
-  const file = document.getElementById("fileInput").files[0];
-  if (!file) return;
-  const formData = new FormData();
-  formData.append("file", file);
-  const res = await fetch("/upload_pdf", { method: "POST", body: formData });
-  const data = await res.json();
-  if (data.text) document.getElementById("textInput").value = data.text;
-  document.getElementById("fileInput").value = "";
-}
-
-function addRow() {
-  const c = document.getElementById("batchContainer");
-  const d = document.createElement("div");
-  d.className = "batch-block";
-  d.innerHTML = `
-    <label>Name:</label><input type="text"/>
-    <label>Title:</label><input type="text"/>
-    <label>Date:</label><input type="text"/>
-    <label>Details:</label><textarea></textarea>
-    <button class="remove-row-btn" onclick="this.parentElement.remove()">Remove</button>
-  `;
-  c.appendChild(d);
+async function generatePDF() {  
+  let text = document.getElementById("textInput").value;  
+  const cards = document.querySelectorAll(".batch-block");  
+  if (cards.length > 0) {  
+    text = "";  
+    cards.forEach((card, i) => {  
+      const inputs = card.querySelectorAll("input, textarea");  
+      const name = inputs[0].value || "No name";  
+      const title = inputs[1].value || "Untitled";  
+      const date = inputs[2].value || "No date";  
+      const details = inputs[3].value || "No details";  
+      text += `\n\n🗂️ Card ${i + 1}\nName: ${name}\nTitle: ${title}\nDate: ${date}\nDetails:\n${details}\n`;  
+    });  
+  }  
+  
+  if (!text.trim()) return alert("Please type something first!");  
+  
+  const overlay = document.createElement("div");  
+  overlay.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:10000;";  
+  const barContainer = document.createElement("div");  
+  barContainer.style = "width:300px;height:12px;border:2px solid #00ccff;border-radius:10px;overflow:hidden;background:#111;";  
+  const bar = document.createElement("div");  
+  bar.style = "width:0%;height:100%;background:linear-gradient(90deg,#00ccff,#7b2ff7);transition:width 1s ease;";  
+  const msg = document.createElement("p");  
+  msg.textContent = "⚙️ Generating PDF...";  
+  msg.style = "color:#00e6ff;margin-top:15px;font-family:Inter,sans-serif;font-size:14px;text-align:center;";  
+  barContainer.appendChild(bar);  
+  const box = document.createElement("div");  
+  box.style = "text-align:center;";  
+  box.append(barContainer, msg);  
+  overlay.appendChild(box);  
+  document.body.appendChild(overlay);  
+  
+  let progress = 0;  
+  const interval = setInterval(() => {  
+    if (progress < 90) { progress += Math.random() * 15; bar.style.width = Math.min(progress, 90) + "%"; }  
+  }, 400);  
+  
+  try {  
+    const fd = new FormData();  
+    fd.append("text", text);  
+    const res = await fetch("/generate_pdf", { method: "POST", body: fd });  
+  
+    clearInterval(interval);  
+    bar.style.width = "100%";  
+    msg.textContent = "✅ PDF ready!";  
+  
+    const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_49c181d6a4.mp3?filename=success-1-6297.mp3");  
+    audio.volume = 0.4;  
+    audio.play().catch(()=>{});  
+  
+    if (res.ok) {  
+      const blob = await res.blob();  
+      const a = document.createElement("a");  
+      a.href = URL.createObjectURL(blob);  
+      a.download = "batch_document.pdf";  
+      a.click();  
+      refreshCounter();  
+    } else alert("Error generating PDF!");  
+  } catch (e) { alert("Error: " + e.message); }  
+  
+  setTimeout(() => overlay.remove(), 2000);  
+}  
+  
+async function uploadPDF() {  
+  const file = document.getElementById("fileInput").files[0];  
+  if (!file) return;  
+  const formData = new FormData();  
+  formData.append("file", file);  
+  const res = await fetch("/upload_pdf", { method: "POST", body: formData });  
+  const data = await res.json();  
+  if (data.text) document.getElementById("textInput").value = data.text;  
+  document.getElementById("fileInput").value = "";  
+}  
+  
+function addRow() {  
+  const c = document.getElementById("batchContainer");  
+  const d = document.createElement("div");  
+  d.className = "batch-block";  
+  d.innerHTML = `<label>Name:</label><input type="text"/><label>Title:</label><input type="text"/><label>Date:</label><input type="text"/><label>Details:</label><textarea></textarea><button class="remove-row-btn" onclick="this.parentElement.remove()">Remove</button>`;  c.appendChild(d);
 }
 
 async function refreshCounter() {
-  try {
-    const r = await fetch("/counter");
-    const d = await r.json();
-    document.getElementById("pdfCount").textContent = "PDFs: " + d.count;
-  } catch {}
+try {
+const r = await fetch("/counter");
+const d = await r.json();
+document.getElementById("pdfCount").textContent = "PDFs: " + d.count;
+} catch {}
 }
 
 setInterval(refreshCounter, 8000);
 
 function toggleAdmin() {
-  const p = document.getElementById("adminPanel");
-  p.style.display = p.style.display === "block" ? "none" : "block";
-  if (p.style.display === "block") loadStats();
+const p = document.getElementById("adminPanel");
+p.style.display = p.style.display === "block" ? "none" : "block";
+if (p.style.display === "block") loadStats();
 }
 
 async function loadStats() {
-  try {
-    const r = await fetch("/admin_stats");
-    const d = await r.json();
-    document.getElementById("adminStats").innerHTML =
-      `<p><strong>Total PDFs:</strong> ${d.total}</p>
-       <p><strong>Today:</strong> ${d.today}</p>
-       <p><strong>Users:</strong> ${d.users}</p>`;
-  } catch {}
+const r = await fetch("/admin_stats");
+const d = await r.json();
+document.getElementById("adminStats").innerHTML =    <p><strong>Total PDFs:</strong> ${d.total}</p>   <p><strong>Today:</strong> ${d.today}</p>   <p><strong>Users:</strong> ${d.users}</p>;
 }
 
 async function openPage(url) {
-  try {
-    const r = await fetch(url);
-    const h = await r.text();
-    document.getElementById("pageInner").innerHTML = h;
-    document.getElementById("pageModal").style.display = "flex";
-  } catch(e) { alert("Error loading page!"); }
+const r = await fetch(url);
+const h = await r.text();
+document.getElementById("pageInner").innerHTML = h;
+document.getElementById("pageModal").style.display = "flex";
 }
 
-function closePage() {
-  document.getElementById("pageModal").style.display = "none";
-}
+function closePage() { document.getElementById("pageModal").style.display = "none"; }
 </script>
-</body>
-</html>
+
+</body>  
+    </html>  
