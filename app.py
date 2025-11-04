@@ -39,16 +39,22 @@ def upload_file():
                     text += page_text + "\n"
             return jsonify({"text": text})
         else:
-            # Para imagens: apenas gera PDF com a imagem
+            # Para imagens: gera PDF diretamente da imagem
             img = Image.open(file)
             buffer = BytesIO()
             img.save(buffer, format="PDF")
             buffer.seek(0)
 
+            # Atualiza contadores
             pdf_counter["total"] += 1
             pdf_counter["today"] += 1
 
-            return send_file(buffer, as_attachment=True, download_name="document.pdf", mimetype="application/pdf")
+            return send_file(
+                buffer,
+                as_attachment=True,
+                download_name="document.pdf",
+                mimetype="application/pdf"
+            )
     except Exception as e:
         return jsonify({"text": f"Erro ao processar arquivo: {str(e)}"})
 
@@ -92,10 +98,16 @@ def generate_pdf():
     c.save()
     buffer.seek(0)
 
+    # Atualiza contadores
     pdf_counter["total"] += 1
     pdf_counter["today"] += 1
 
-    return send_file(buffer, as_attachment=True, download_name="document.pdf", mimetype="application/pdf")
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="document.pdf",
+        mimetype="application/pdf"
+    )
 
 @app.route("/admin_stats")
 def admin_stats():
